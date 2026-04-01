@@ -587,7 +587,7 @@
             const cosLat = Math.cos(baseLat * Math.PI / 180);
             return [0, 1, 2].map(i => {
                 const angle = (i * 120 + Math.random() * 60 - 30) * Math.PI / 180;
-                const dist = 20 + Math.random() * 40;
+                const dist = 8 + Math.random() * 7;
                 return {
                     lat: baseLat + (dist / 111320) * Math.cos(angle),
                     lng: baseLng + (dist / (111320 * cosLat)) * Math.sin(angle)
