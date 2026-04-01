@@ -336,21 +336,11 @@
                 return;
             }
 
-            const tiltFactor = 0.42;
-            pigeon.vx += (tiltX / 45) * tiltFactor;
-            pigeon.vy += (tiltY / 45) * tiltFactor * 0.55;
-
+            pigeon.vx += (tiltX / 45) * 0.7;
             pigeon.vx *= 0.87;
-            pigeon.vy *= 0.87;
             pigeon.vx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, pigeon.vx));
-            pigeon.vy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, pigeon.vy));
-
             pigeon.x += pigeon.vx;
-            pigeon.y += pigeon.vy;
-
-            const topZoneBottom = canvas.height * ZONE_SPLIT - PIGEON_H - 16;
             pigeon.x = Math.max(0, Math.min(canvas.width - PIGEON_W, pigeon.x));
-            pigeon.y = Math.max(SVG_BOTTOM + 4, Math.min(topZoneBottom, pigeon.y));
 
             const now = Date.now();
             if (now - lastNpcDir > 400 + Math.random() * 600) {
