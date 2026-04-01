@@ -206,30 +206,37 @@
             updateHPBar();
         }
 
+        let betaBase = null;
+
         /**
          * Récupère les valeurs d'inclinaison du téléphone depuis l'API d'orientation.
+         * Le premier appel calibre la position neutre de beta (téléphone tenu droit).
          * @param {DeviceOrientationEvent} e - L'événement envoyé par le capteur du téléphone.
          */
         function handleOrientation(e) {
+            if (e.gamma === null) return;
+            if (betaBase === null) betaBase = e.beta || 0;
             tiltX = e.gamma || 0;
-            tiltY = e.beta || 0;
+            tiltY = (e.beta || 0) - betaBase;
         }
 
         /**
          * Demande la permission d'accéder aux capteurs d'orientation.
          * Obligatoire sur iOS, transparent sur Android et desktop.
+         * Écoute aussi deviceorientationabsolute en fallback pour certains Android.
          */
         function requestOrientation() {
+            const listen = () => {
+                window.addEventListener('deviceorientation', handleOrientation);
+                window.addEventListener('deviceorientationabsolute', handleOrientation);
+            };
             if (typeof DeviceOrientationEvent !== 'undefined' &&
                 typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
-                    .then(res => {
-                        if (res === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation);
-                        }
-                    }).catch(() => { });
+                    .then(res => { if (res === 'granted') listen(); })
+                    .catch(() => { });
             } else {
-                window.addEventListener('deviceorientation', handleOrientation);
+                listen();
             }
         }
 
