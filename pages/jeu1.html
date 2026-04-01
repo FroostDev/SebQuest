@@ -11,6 +11,7 @@
         body {
             overflow: hidden;
             padding: 0;
+            background-image: url("../assets/img/backgrounds/jeu_1.jpg");
             background-size: cover;
             touch-action: none;
         }
@@ -221,33 +222,20 @@
         }
 
         /**
-         * Demande la permission d'accéder aux capteurs d'orientation.
-         * Obligatoire sur iOS, transparent sur Android et desktop.
-         * Écoute aussi deviceorientationabsolute en fallback pour certains Android.
+         * Active l'écoute des capteurs d'orientation une fois la permission obtenue.
          */
-        function requestOrientation() {
-            const listen = () => {
-                window.addEventListener('deviceorientation', handleOrientation);
-                window.addEventListener('deviceorientationabsolute', handleOrientation);
-            };
-            if (typeof DeviceOrientationEvent !== 'undefined' &&
-                typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(res => { if (res === 'granted') listen(); })
-                    .catch(() => { });
-            } else {
-                listen();
-            }
+        function listenOrientation() {
+            window.addEventListener('deviceorientation', handleOrientation);
+            window.addEventListener('deviceorientationabsolute', handleOrientation);
         }
 
         /**
-         * Lance la partie : cache l'écran d'accueil, active les capteurs et initialise le jeu.
+         * Lance la partie : cache l'écran d'accueil et initialise le jeu.
          * Ne fait rien si la partie est déjà en cours.
          */
         function startGame() {
             if (gameStarted) return;
             gameStarted = true;
-            requestOrientation();
             document.getElementById('start-overlay').style.display = 'none';
             init();
         }
@@ -266,11 +254,17 @@
             });
         }
 
-        document.getElementById('start-btn').addEventListener('click', startGame);
-        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
-            e.stopPropagation();
+        document.getElementById('start-btn').addEventListener('click', () => {
+            if (typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(res => { if (res === 'granted') listenOrientation(); })
+                    .catch(() => {});
+            } else {
+                listenOrientation();
+            }
             startGame();
-        }, { passive: true });
+        });
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
