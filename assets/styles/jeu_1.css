@@ -1,0 +1,10 @@
+body {
+    background-image: url("/assets/img/backgrounds/jeu_1.jpg");
+    background-size: 100%;
+    padding: 16px;
+}
+
+.status_bar {
+    max-width: 90%;
+    height: auto;
+}

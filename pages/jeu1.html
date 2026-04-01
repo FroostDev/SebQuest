@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Seb Quest</title>
+    <link rel="stylesheet" href="/assets/styles/base.css">
+    <link rel="stylesheet" href="/assets/styles/jeu_1.css">
+    <style>
+        body {
+            overflow: hidden;
+            padding: 0;
+            background-size: cover;
+            touch-action: none;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .status_bar {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            pointer-events: none;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #start-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            background: rgba(0, 0, 0, 0.45);
+            color: #fff;
+            font-family: "Retro", monospace;
+            gap: 16px;
+        }
+
+        #start-overlay h1 {
+            font-size: 2rem;
+            color: var(--yellow);
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #start-overlay p {
+            font-size: 1rem;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        #start-btn {
+            margin-top: 8px;
+            padding: 12px 32px;
+            font-size: 1.2rem;
+            font-family: "Retro", monospace;
+            cursor: pointer;
+            background: var(--yellow);
+            border: none;
+            border-right: var(--lightyellow) 4px solid;
+            border-top: var(--lightyellow) 4px solid;
+            border-left: var(--darkyellow) 4px solid;
+            border-bottom: var(--darkyellow) 4px solid;
+            color: var(--white);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <svg class="status_bar" width="393" height="112" viewBox="0 0 393 112" fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+        <g id="Stats">
+            <g id="cadre">
+                <g id="Union">
+                    <mask id="path-1-outside-1_29_41" maskUnits="userSpaceOnUse" x="-0.5" y="-0.5" width="113"
+                        height="113" fill="black">
+                        <rect fill="white" x="-0.5" y="-0.5" width="113" height="113" />
+                        <path
+                            d="M16.3311 10.915H95.6689V5.5H106.5V16.3311H101.084V95.6689H106.5V106.5H95.6689V101.084H16.3311V106.5H5.5V95.6689H10.915V16.3311H5.5V5.5H16.3311V10.915Z" />
+                    </mask>
+                    <path
+                        d="M16.3311 10.915H95.6689V5.5H106.5V16.3311H101.084V95.6689H106.5V106.5H95.6689V101.084H16.3311V106.5H5.5V95.6689H10.915V16.3311H5.5V5.5H16.3311V10.915Z"
+                        fill="#4A402D" />
+                    <path
+                        d="M16.3311 10.915H10.8311V16.415H16.3311V10.915ZM95.6689 10.915V16.415H101.169V10.915H95.6689ZM95.6689 5.5V0H90.1689V5.5H95.6689ZM106.5 5.5H112V0H106.5V5.5ZM106.5 16.3311V21.8311H112V16.3311H106.5ZM101.084 16.3311V10.8311H95.584V16.3311H101.084ZM101.084 95.6689H95.584V101.169H101.084V95.6689ZM106.5 95.6689H112V90.1689H106.5V95.6689ZM106.5 106.5V112H112V106.5H106.5ZM95.6689 106.5H90.1689V112H95.6689V106.5ZM95.6689 101.084H101.169V95.584H95.6689V101.084ZM16.3311 101.084V95.584H10.8311V101.084H16.3311ZM16.3311 106.5V112H21.8311V106.5H16.3311ZM5.5 106.5H0V112H5.5V106.5ZM5.5 95.6689V90.1689H0V95.6689H5.5ZM10.915 95.6689V101.169H16.415V95.6689H10.915ZM10.915 16.3311H16.415V10.8311H10.915V16.3311ZM5.5 16.3311H0V21.8311H5.5V16.3311ZM5.5 5.5V0H0V5.5H5.5ZM16.3311 5.5H21.8311V0H16.3311V5.5ZM16.3311 10.915V16.415H95.6689V10.915V5.41504H16.3311V10.915ZM95.6689 10.915H101.169V5.5H95.6689H90.1689V10.915H95.6689ZM95.6689 5.5V11H106.5V5.5V0H95.6689V5.5ZM106.5 5.5H101V16.3311H106.5H112V5.5H106.5ZM106.5 16.3311V10.8311H101.084V16.3311V21.8311H106.5V16.3311ZM101.084 16.3311H95.584V95.6689H101.084H106.584V16.3311H101.084ZM101.084 95.6689V101.169H106.5V95.6689V90.1689H101.084V95.6689ZM106.5 95.6689H101V106.5H106.5H112V95.6689H106.5ZM106.5 106.5V101H95.6689V106.5V112H106.5V106.5ZM95.6689 106.5H101.169V101.084H95.6689H90.1689V106.5H95.6689ZM95.6689 101.084V95.584H16.3311V101.084V106.584H95.6689V101.084ZM16.3311 101.084H10.8311V106.5H16.3311H21.8311V101.084H16.3311ZM16.3311 106.5V101H5.5V106.5V112H16.3311V106.5ZM5.5 106.5H11V95.6689H5.5H0V106.5H5.5ZM5.5 95.6689V101.169H10.915V95.6689V90.1689H5.5V95.6689ZM10.915 95.6689H16.415V16.3311H10.915H5.41504V95.6689H10.915ZM10.915 16.3311V10.8311H5.5V16.3311V21.8311H10.915V16.3311ZM5.5 16.3311H11V5.5H5.5H0V16.3311H5.5ZM5.5 5.5V11H16.3311V5.5V0H5.5V5.5ZM16.3311 5.5H10.8311V10.915H16.3311H21.8311V5.5H16.3311Z"
+                        fill="#8B582B" mask="url(#path-1-outside-1_29_41)" />
+                </g>
+                <rect id="Rectangle 160" x="15.5" y="68" width="40" height="4" fill="#3E3523" />
+                <rect id="Rectangle 169" x="52.5" y="84.5" width="28" height="3" fill="#3E3523" />
+                <rect id="Rectangle 170" x="57.5" y="95" width="36" height="6" fill="#3E3523" />
+                <rect id="Rectangle 164" x="11.5" y="59" width="24" height="5" fill="#3E3523" />
+                <rect id="Rectangle 165" x="18.5" y="24" width="47" height="7" fill="#3E3523" />
+                <rect id="Rectangle 172" x="13.5" y="11" width="27" height="3" fill="#3E3523" />
+                <rect id="Rectangle 166" x="91.5" y="39" width="8" height="5" fill="#3E3523" />
+                <rect id="Rectangle 167" x="79.5" y="19" width="21" height="4" fill="#3E3523" />
+                <rect id="Rectangle 161" x="72.5" y="76" width="27" height="6" fill="#3E3523" />
+                <rect id="Rectangle 162" x="12.5" y="90" width="27" height="3" fill="#3E3523" />
+                <rect id="Rectangle 163" x="58.5" y="53" width="37" height="6" fill="#3E3523" />
+                <rect id="Rectangle 168" x="31.5" y="44" width="38" height="3" fill="#3E3523" />
+            </g>
+            <g id="vie">
+                <mask id="path-15-outside-2_29_41" maskUnits="userSpaceOnUse" x="106.5" y="28" width="262" height="24"
+                    fill="black">
+                    <rect fill="white" x="106.5" y="28" width="262" height="24" />
+                    <path d="M106.5 34H362.5V46H106.5V34Z" />
+                </mask>
+                <path d="M106.5 34H362.5V46H106.5V34Z" fill="#3a0a0a" />
+                <rect id="hp-fill" x="106.5" y="34" width="256" height="12" fill="#AE3434" />
+                <path
+                    d="M362.5 34H368.5V28H362.5V34ZM362.5 46V52H368.5V46H362.5ZM106.5 34V40H362.5V34V28H106.5V34ZM362.5 34H356.5V46H362.5H368.5V34H362.5ZM362.5 46V40H106.5V46V52H362.5V46Z"
+                    fill="#6B1E1E" mask="url(#path-15-outside-2_29_41)" />
+            </g>
+            <g id="timer">
+                <mask id="path-17-outside-3_29_41" maskUnits="userSpaceOnUse" x="106.5" y="60" width="286" height="24"
+                    fill="black">
+                    <rect fill="white" x="106.5" y="60" width="286" height="24" />
+                    <path d="M106.5 66H386.5V78H106.5V66Z" />
+                </mask>
+                <path d="M106.5 66H386.5V78H106.5V66Z" fill="#478C9A" />
+                <path
+                    d="M386.5 66H392.5V60H386.5V66ZM386.5 78V84H392.5V78H386.5ZM106.5 66V72H386.5V66V60H106.5V66ZM386.5 66H380.5V78H386.5H392.5V66H386.5ZM386.5 78V72H106.5V78V84H386.5V78Z"
+                    fill="#306D79" mask="url(#path-17-outside-3_29_41)" />
+            </g>
+        </g>
+    </svg>
+
+    <div id="start-overlay">
+        <h1>PIGEON ATTACK</h1>
+        <p>Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.</p>
+        <button id="start-btn">JOUER</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const PIGEON_W = 44;
+        const PIGEON_H = 32;
+        const NPC_W = 46;
+        const NPC_H = 50;
+        const POOP_W = 16;
+        const POOP_H = 20;
+        const GRAVITY = 0.28;
+        const MAX_SPEED = 11;
+        const ZONE_SPLIT = 0.52;
+        const SVG_BOTTOM = 130;
+        const HP_BAR_MAX_W = 256;
+
+        let hp = 100;
+        let pigeon = { x: 0, y: 0, vx: 0, vy: 0 };
+        let npc = { x: 0, y: 0, vx: 3, vy: 0 };
+        let poops = [];
+        let tiltX = 0;
+        let tiltY = 0;
+        let gameStarted = false;
+        let gameOver = false;
+        let lastNpcDir = 0;
+        let hitFlash = 0;
+
+        /**
+         * Adapte la taille du canvas à celle de la fenêtre.
+         * À appeler au chargement et à chaque redimensionnement.
+         */
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        /**
+         * Remet tout à zéro pour une nouvelle partie :
+         * position du pigeon, du NPC, projectiles, et points de vie.
+         */
+        function init() {
+            pigeon.x = canvas.width / 2 - PIGEON_W / 2;
+            pigeon.y = SVG_BOTTOM + 30;
+            pigeon.vx = 0;
+            pigeon.vy = 0;
+
+            npc.x = canvas.width / 2 - NPC_W / 2;
+            npc.y = canvas.height * 0.82;
+            npc.vx = 3;
+            npc.vy = 0;
+
+            poops = [];
+            hp = 100;
+            gameOver = false;
+            updateHPBar();
+        }
+
+        /**
+         * Récupère les valeurs d'inclinaison du téléphone depuis l'API d'orientation.
+         * @param {DeviceOrientationEvent} e - L'événement envoyé par le capteur du téléphone.
+         */
+        function handleOrientation(e) {
+            tiltX = e.gamma || 0;
+            tiltY = e.beta || 0;
+        }
+
+        /**
+         * Demande la permission d'accéder aux capteurs d'orientation.
+         * Obligatoire sur iOS, transparent sur Android et desktop.
+         */
+        function requestOrientation() {
+            if (typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(res => {
+                        if (res === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation);
+                        }
+                    }).catch(() => { });
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+        }
+
+        /**
+         * Lance la partie : cache l'écran d'accueil, active les capteurs et initialise le jeu.
+         * Ne fait rien si la partie est déjà en cours.
+         */
+        function startGame() {
+            if (gameStarted) return;
+            gameStarted = true;
+            requestOrientation();
+            document.getElementById('start-overlay').style.display = 'none';
+            init();
+        }
+
+        /**
+         * Lâche un caca depuis le bas du pigeon.
+         * Le projectile hérite d'une partie de la vitesse horizontale du pigeon.
+         */
+        function shootPoop() {
+            if (!gameStarted || gameOver) return;
+            poops.push({
+                x: pigeon.x + PIGEON_W / 2 - POOP_W / 2,
+                y: pigeon.y + PIGEON_H,
+                vx: pigeon.vx * 0.35,
+                vy: 2.5
+            });
+        }
+
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
+            e.stopPropagation();
+            startGame();
+        }, { passive: true });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameStarted) {
+                startGame();
+            } else if (gameOver) {
+                init();
+            } else {
+                shootPoop();
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('click', () => {
+            if (!gameStarted) {
+                startGame();
+            } else if (gameOver) {
+                init();
+            } else {
+                shootPoop();
+            }
+        });
+
+        /**
+         * Met à jour la largeur de la barre de vie dans le SVG
+         * en fonction de la valeur actuelle de `hp`.
+         */
+        function updateHPBar() {
+            const fill = document.getElementById('hp-fill');
+            if (fill) {
+                fill.setAttribute('width', Math.max(0, (hp / 100) * HP_BAR_MAX_W).toFixed(1));
+            }
+        }
+
+        /**
+         * Calcule toute la logique du jeu à chaque frame :
+         * déplacement du pigeon selon l'inclinaison, comportement du NPC,
+         * physique des projectiles et détection des collisions.
+         */
+        function update() {
+            if (!gameStarted || gameOver) return;
+
+            const tiltFactor = 0.42;
+            pigeon.vx += (tiltX / 45) * tiltFactor;
+            pigeon.vy += (tiltY / 45) * tiltFactor * 0.55;
+
+            pigeon.vx *= 0.87;
+            pigeon.vy *= 0.87;
+            pigeon.vx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, pigeon.vx));
+            pigeon.vy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, pigeon.vy));
+
+            pigeon.x += pigeon.vx;
+            pigeon.y += pigeon.vy;
+
+            const topZoneBottom = canvas.height * ZONE_SPLIT - PIGEON_H - 16;
+            pigeon.x = Math.max(0, Math.min(canvas.width - PIGEON_W, pigeon.x));
+            pigeon.y = Math.max(SVG_BOTTOM + 4, Math.min(topZoneBottom, pigeon.y));
+
+            const now = Date.now();
+            if (now - lastNpcDir > 400 + Math.random() * 600) {
+                const roll = Math.random();
+                if (roll < 0.15) {
+                    npc.vx = 0;
+                } else if (roll < 0.65) {
+                    npc.vx = 1 + Math.random() * 1.5;
+                } else {
+                    npc.vx = -(1 + Math.random() * 1.5);
+                }
+                lastNpcDir = now;
+            }
+
+            npc.x += npc.vx;
+
+            if (npc.x < 0) { npc.x = 0; npc.vx = Math.abs(npc.vx); }
+            if (npc.x + NPC_W > canvas.width) { npc.x = canvas.width - NPC_W; npc.vx = -Math.abs(npc.vx); }
+
+            if (hitFlash > 0) hitFlash--;
+
+            for (let i = poops.length - 1; i >= 0; i--) {
+                const p = poops[i];
+                p.vy += GRAVITY;
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < npc.x + NPC_W &&
+                    p.x + POOP_W > npc.x &&
+                    p.y < npc.y + NPC_H &&
+                    p.y + POOP_H > npc.y) {
+                    hp = Math.max(0, hp - 10);
+                    updateHPBar();
+                    hitFlash = 8;
+                    poops.splice(i, 1);
+                    continue;
+                }
+
+                if (p.y > canvas.height + 60 || p.x < -60 || p.x > canvas.width + 60) {
+                    poops.splice(i, 1);
+                }
+            }
+        }
+
+        /**
+         * Dessine tout ce qui est visible à l'écran : le pigeon, le NPC,
+         * les projectiles, l'ombre et l'écran de game over si besoin.
+         */
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const splitY = canvas.height * ZONE_SPLIT;
+
+            if (!gameStarted) return;
+
+            const shadowY = splitY - 6;
+            const shadowScale = Math.max(0.2, 1 - (shadowY - pigeon.y) / (splitY - SVG_BOTTOM));
+            ctx.save();
+            ctx.globalAlpha = 0.18 * shadowScale;
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.ellipse(
+                pigeon.x + PIGEON_W / 2, shadowY,
+                PIGEON_W * 0.5 * shadowScale, 6 * shadowScale,
+                0, 0, Math.PI * 2
+            );
+            ctx.fill();
+            ctx.restore();
+
+            ctx.fillStyle = '#b4cde8';
+            ctx.fillRect(pigeon.x, pigeon.y, PIGEON_W, PIGEON_H);
+            ctx.fillStyle = '#d8eaf8';
+            ctx.fillRect(pigeon.x + 4, pigeon.y + 4, PIGEON_W - 8, 8);
+            ctx.strokeStyle = '#6a94be';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pigeon.x, pigeon.y, PIGEON_W, PIGEON_H);
+
+            ctx.save();
+            ctx.setLineDash([4, 6]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(pigeon.x + PIGEON_W / 2, pigeon.y + PIGEON_H);
+            ctx.lineTo(pigeon.x + PIGEON_W / 2, splitY);
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = hitFlash > 0 ? '#ff3030' : '#e8863a';
+            ctx.fillRect(npc.x, npc.y, NPC_W, NPC_H);
+            ctx.fillStyle = hitFlash > 0 ? '#ff7070' : '#f0a060';
+            ctx.fillRect(npc.x + 4, npc.y + 4, NPC_W - 8, 10);
+            ctx.strokeStyle = hitFlash > 0 ? '#aa0000' : '#b05818';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(npc.x, npc.y, NPC_W, NPC_H);
+
+            ctx.fillStyle = '#1a0a00';
+            ctx.font = 'bold 10px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('NPC', npc.x + NPC_W / 2, npc.y + NPC_H / 2);
+
+            for (const p of poops) {
+                ctx.fillStyle = '#7b4220';
+                ctx.fillRect(p.x, p.y, POOP_W, POOP_H);
+                ctx.fillStyle = '#a05c30';
+                ctx.fillRect(p.x + 2, p.y + 2, POOP_W - 6, 5);
+                ctx.strokeStyle = '#3d1a08';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(p.x, p.y, POOP_W, POOP_H);
+            }
+
+            if (gameOver) {
+                ctx.fillStyle = 'rgba(0,0,0,0.55)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 38px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 24);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '18px monospace';
+                ctx.fillText('Tape pour rejouer', canvas.width / 2, canvas.height / 2 + 24);
+            }
+        }
+
+        /**
+         * Boucle principale du jeu, tourne à chaque frame
+         * Elle appelle update() puis draw() indéfiniment.
+         */
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+
+</html>
