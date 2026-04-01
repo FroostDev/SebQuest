@@ -397,6 +397,8 @@
         let timerStart = 0;
         let compassHeading = 0;
         let radarPhase = false;
+        let pigeonPaused = false;
+        let pigeonPauseStamp = 0;
         const keys = {};
         const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
@@ -706,9 +708,6 @@
             }
         }
 
-        let pigeonPaused = false;
-        let pigeonPauseStamp = 0;
-
         /**
          * Met le jeu pigeon sur pause et ouvre le menu.
          */
@@ -730,13 +729,17 @@
         }
 
         document.getElementById('pigeon-pause-btn').addEventListener('click', pausePigeon);
+        document.getElementById('pigeon-pause-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); pausePigeon(); }, { passive: true });
         document.getElementById('pigeon-resume-btn').addEventListener('click', resumePigeon);
-        document.getElementById('skip-radar-btn').addEventListener('click', () => {
+        document.getElementById('pigeon-resume-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); resumePigeon(); }, { passive: true });
+        const skipToRadar = () => {
             document.getElementById('pigeon-pause-menu').classList.remove('open');
             pigeonPaused = false;
             document.getElementById('pigeon-pause-btn').style.display = 'none';
             startRadarPhase();
-        });
+        };
+        document.getElementById('skip-radar-btn').addEventListener('click', skipToRadar);
+        document.getElementById('skip-radar-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); skipToRadar(); }, { passive: true });
 
         /**
          * Boucle principale du jeu, tourne en permanence.
