@@ -134,7 +134,8 @@
                     <rect fill="white" x="106.5" y="60" width="286" height="24" />
                     <path d="M106.5 66H386.5V78H106.5V66Z" />
                 </mask>
-                <path d="M106.5 66H386.5V78H106.5V66Z" fill="#478C9A" />
+                <path d="M106.5 66H386.5V78H106.5V66Z" fill="#1a3f47" />
+                <rect id="timer-fill" x="106.5" y="66" width="280" height="12" fill="#478C9A" />
                 <path
                     d="M386.5 66H392.5V60H386.5V66ZM386.5 78V84H392.5V78H386.5ZM106.5 66V72H386.5V66V60H106.5V66ZM386.5 66H380.5V78H386.5H392.5V66H386.5ZM386.5 78V72H106.5V78V84H386.5V78Z"
                     fill="#306D79" mask="url(#path-17-outside-3_29_41)" />
@@ -163,6 +164,9 @@
         const ZONE_SPLIT = 0.52;
         const SVG_BOTTOM = 130;
         const HP_BAR_MAX_W = 256;
+        const TIMER_BAR_MAX_W = 280;
+        const TIMER_DURATION = 30000;
+        const SHOOT_COOLDOWN = 800;
 
         let hp = 100;
         let pigeon = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -174,6 +178,8 @@
         let gameOver = false;
         let lastNpcDir = 0;
         let hitFlash = 0;
+        let lastShot = 0;
+        let timerStart = 0;
 
         /**
          * Adapte la taille du canvas à celle de la fenêtre.
