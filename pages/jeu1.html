@@ -210,7 +210,10 @@
             poops = [];
             hp = 100;
             gameOver = false;
+            timerStart = Date.now();
+            lastShot = 0;
             updateHPBar();
+            updateTimerBar(1);
         }
 
         let betaBase = null;
@@ -249,15 +252,28 @@
         /**
          * Lâche un caca depuis le bas du pigeon.
          * Le projectile hérite d'une partie de la vitesse horizontale du pigeon.
+         * Un cooldown empêche de tirer en rafale.
          */
         function shootPoop() {
             if (!gameStarted || gameOver) return;
+            const now = Date.now();
+            if (now - lastShot < SHOOT_COOLDOWN) return;
+            lastShot = now;
             poops.push({
                 x: pigeon.x + PIGEON_W / 2 - POOP_W / 2,
                 y: pigeon.y + PIGEON_H,
                 vx: pigeon.vx * 0.35,
                 vy: 2.5
             });
+        }
+
+        /**
+         * Met à jour la barre de timer dans le SVG.
+         * @param {number} ratio - Valeur entre 0 et 1 (1 = plein, 0 = vide).
+         */
+        function updateTimerBar(ratio) {
+            const fill = document.getElementById('timer-fill');
+            if (fill) fill.setAttribute('width', Math.max(0, ratio * TIMER_BAR_MAX_W).toFixed(1));
         }
 
         document.getElementById('start-btn').addEventListener('click', () => {
@@ -311,6 +327,14 @@
          */
         function update() {
             if (!gameStarted || gameOver) return;
+
+            const elapsed = Date.now() - timerStart;
+            const ratio = Math.max(0, 1 - elapsed / TIMER_DURATION);
+            updateTimerBar(ratio);
+            if (ratio === 0 && hp > 0) {
+                gameOver = true;
+                return;
+            }
 
             const tiltFactor = 0.42;
             pigeon.vx += (tiltX / 45) * tiltFactor;
