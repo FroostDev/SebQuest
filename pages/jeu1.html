@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Seb Quest</title>
-    <link rel="stylesheet" href="/assets/styles/base.css">
-    <link rel="stylesheet" href="/assets/styles/jeu_1.css">
+    <link rel="stylesheet" href="../assets/styles/base.css">
+    <link rel="stylesheet" href="../assets/styles/jeu_1.css">
     <style>
         body {
             overflow: hidden;
@@ -24,6 +24,11 @@
             width: 100%;
             height: 100%;
             z-index: 0;
+        }
+
+        #radarCanvas {
+            display: none;
+            z-index: 1;
         }
 
         .status_bar {
@@ -84,6 +89,7 @@
 
 <body>
     <canvas id="gameCanvas"></canvas>
+    <canvas id="radarCanvas"></canvas>
 
     <svg class="status_bar" width="393" height="112" viewBox="0 0 393 112" fill="none"
         xmlns="http://www.w3.org/2000/svg">
@@ -145,11 +151,15 @@
 
     <div id="start-overlay">
         <h1>PIGEON ATTACK</h1>
-        <p>Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.</p>
+        <p id="controls-hint">Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.</p>
         <button id="start-btn">JOUER</button>
     </div>
 
     <script>
+        // ════════════════════════════════════════════════════════════════
+        //                       PARTIE 1 — PIGEON
+        // ════════════════════════════════════════════════════════════════
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -180,14 +190,24 @@
         let hitFlash = 0;
         let lastShot = 0;
         let timerStart = 0;
+        let compassHeading = 0;
+        let radarPhase = false;
+        const keys = {};
+        const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+        document.getElementById('controls-hint').innerHTML = isMobile
+            ? 'Incline ton téléphone pour viser.<br>Tape l\'écran pour lâcher une bombe.'
+            : '← → ou A D pour viser.<br>Espace ou clic pour lâcher une bombe.';
 
         /**
-         * Adapte la taille du canvas à celle de la fenêtre.
-         * À appeler au chargement et à chaque redimensionnement.
+         * Adapte la taille des deux canvas à la fenêtre du téléphone.
+         * À appeler au chargement et quand l'orientation change.
          */
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            const rc = document.getElementById('radarCanvas');
+            if (rc) { rc.width = window.innerWidth; rc.height = window.innerHeight; }
         }
         resize();
         window.addEventListener('resize', resize);
@@ -203,7 +223,7 @@
             pigeon.vy = 0;
 
             npc.x = canvas.width / 2 - NPC_W / 2;
-            npc.y = canvas.height * 0.82;
+            npc.y = canvas.height * 0.86;
             npc.vx = 3;
             npc.vy = 0;
 
@@ -219,15 +239,21 @@
         let betaBase = null;
 
         /**
-         * Récupère les valeurs d'inclinaison du téléphone depuis l'API d'orientation.
-         * Le premier appel calibre la position neutre de beta (téléphone tenu droit).
-         * @param {DeviceOrientationEvent} e - L'événement envoyé par le capteur du téléphone.
+         * Récupère l'inclinaison du téléphone depuis les capteurs.
+         * Calibre la position neutre au premier appel, et attrape aussi
+         * le cap compas pour la partie radar.
+         * @param {DeviceOrientationEvent} e - L'événement d'orientation.
          */
         function handleOrientation(e) {
             if (e.gamma === null) return;
             if (betaBase === null) betaBase = e.beta || 0;
             tiltX = e.gamma || 0;
             tiltY = (e.beta || 0) - betaBase;
+            if (typeof e.webkitCompassHeading === 'number') {
+                compassHeading = e.webkitCompassHeading;
+            } else if (e.alpha !== null) {
+                compassHeading = (360 - (e.alpha || 0)) % 360;
+            }
         }
 
         /**
@@ -252,7 +278,7 @@
         /**
          * Lâche un caca depuis le bas du pigeon.
          * Le projectile hérite d'une partie de la vitesse horizontale du pigeon.
-         * Un cooldown empêche de tirer en rafale.
+         * Un cooldown de 800ms empêche de spammer.
          */
         function shootPoop() {
             if (!gameStarted || gameOver) return;
@@ -269,7 +295,7 @@
 
         /**
          * Met à jour la barre de timer dans le SVG.
-         * @param {number} ratio - Valeur entre 0 et 1 (1 = plein, 0 = vide).
+         * @param {number} ratio - Entre 0 et 1 (1 = plein, 0 = vide).
          */
         function updateTimerBar(ratio) {
             const fill = document.getElementById('timer-fill');
@@ -310,20 +336,31 @@
         });
 
         /**
-         * Met à jour la largeur de la barre de vie dans le SVG
-         * en fonction de la valeur actuelle de `hp`.
+         * Suit les touches clavier enfoncées pour les contrôles PC.
+         * Espace et flèche haut tirent un caca directement.
+         */
+        window.addEventListener('keydown', e => {
+            keys[e.key] = true;
+            if (e.key === ' ' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (gameStarted && !gameOver && !radarPhase) shootPoop();
+            }
+        });
+
+        window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        /**
+         * Met à jour la largeur de la barre de vie dans le SVG.
          */
         function updateHPBar() {
             const fill = document.getElementById('hp-fill');
-            if (fill) {
-                fill.setAttribute('width', Math.max(0, (hp / 100) * HP_BAR_MAX_W).toFixed(1));
-            }
+            if (fill) fill.setAttribute('width', Math.max(0, (hp / 100) * HP_BAR_MAX_W).toFixed(1));
         }
 
         /**
          * Calcule toute la logique du jeu à chaque frame :
-         * déplacement du pigeon selon l'inclinaison, comportement du NPC,
-         * physique des projectiles et détection des collisions.
+         * déplacement du pigeon, comportement du NPC, physique des
+         * projectiles et détection des collisions.
          */
         function update() {
             if (!gameStarted || gameOver) return;
@@ -331,32 +368,34 @@
             const elapsed = Date.now() - timerStart;
             const ratio = Math.max(0, 1 - elapsed / TIMER_DURATION);
             updateTimerBar(ratio);
-            if (ratio === 0 && hp > 0) {
+            if (ratio === 0) {
                 gameOver = true;
                 return;
             }
 
-            pigeon.vx += (tiltX / 45) * 0.7;
+            let effectiveTilt = tiltX;
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) effectiveTilt -= 45;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) effectiveTilt += 45;
+            pigeon.vx += (effectiveTilt / 45) * 0.7;
             pigeon.vx *= 0.87;
             pigeon.vx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, pigeon.vx));
             pigeon.x += pigeon.vx;
             pigeon.x = Math.max(0, Math.min(canvas.width - PIGEON_W, pigeon.x));
 
             const now = Date.now();
-            if (now - lastNpcDir > 400 + Math.random() * 600) {
+            if (now - lastNpcDir > 300 + Math.random() * 400) {
                 const roll = Math.random();
-                if (roll < 0.15) {
+                if (roll < 0.08) {
                     npc.vx = 0;
-                } else if (roll < 0.65) {
-                    npc.vx = 1 + Math.random() * 1.5;
+                } else if (roll < 0.55) {
+                    npc.vx = 0.8 + Math.random() * 1.2;
                 } else {
-                    npc.vx = -(1 + Math.random() * 1.5);
+                    npc.vx = -(0.8 + Math.random() * 1.2);
                 }
                 lastNpcDir = now;
             }
 
             npc.x += npc.vx;
-
             if (npc.x < 0) { npc.x = 0; npc.vx = Math.abs(npc.vx); }
             if (npc.x + NPC_W > canvas.width) { npc.x = canvas.width - NPC_W; npc.vx = -Math.abs(npc.vx); }
 
@@ -368,14 +407,16 @@
                 p.x += p.vx;
                 p.y += p.vy;
 
-                if (p.x < npc.x + NPC_W &&
-                    p.x + POOP_W > npc.x &&
-                    p.y < npc.y + NPC_H &&
-                    p.y + POOP_H > npc.y) {
+                if (p.x < npc.x + NPC_W && p.x + POOP_W > npc.x &&
+                    p.y < npc.y + NPC_H && p.y + POOP_H > npc.y) {
                     hp = Math.max(0, hp - 10);
                     updateHPBar();
                     hitFlash = 8;
                     poops.splice(i, 1);
+                    if (hp <= 0) {
+                        startRadarPhase();
+                        return;
+                    }
                     continue;
                 }
 
@@ -386,14 +427,12 @@
         }
 
         /**
-         * Dessine tout ce qui est visible à l'écran : le pigeon, le NPC,
-         * les projectiles, l'ombre et l'écran de game over si besoin.
+         * Dessine tout ce qui est visible : pigeon, NPC, projectiles,
+         * ombre projetée, et l'écran de game over si besoin.
          */
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             const splitY = canvas.height * ZONE_SPLIT;
-
             if (!gameStarted) return;
 
             const shadowY = splitY - 6;
@@ -402,11 +441,7 @@
             ctx.globalAlpha = 0.18 * shadowScale;
             ctx.fillStyle = '#000';
             ctx.beginPath();
-            ctx.ellipse(
-                pigeon.x + PIGEON_W / 2, shadowY,
-                PIGEON_W * 0.5 * shadowScale, 6 * shadowScale,
-                0, 0, Math.PI * 2
-            );
+            ctx.ellipse(pigeon.x + PIGEON_W / 2, shadowY, PIGEON_W * 0.5 * shadowScale, 6 * shadowScale, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
 
@@ -435,7 +470,6 @@
             ctx.strokeStyle = hitFlash > 0 ? '#aa0000' : '#b05818';
             ctx.lineWidth = 2;
             ctx.strokeRect(npc.x, npc.y, NPC_W, NPC_H);
-
             ctx.fillStyle = '#1a0a00';
             ctx.font = 'bold 10px monospace';
             ctx.textAlign = 'center';
@@ -455,13 +489,11 @@
             if (gameOver) {
                 ctx.fillStyle = 'rgba(0,0,0,0.55)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
                 ctx.fillStyle = '#FFD700';
                 ctx.font = 'bold 38px monospace';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 24);
-
                 ctx.fillStyle = '#fff';
                 ctx.font = '18px monospace';
                 ctx.fillText('Tape pour rejouer', canvas.width / 2, canvas.height / 2 + 24);
@@ -469,16 +501,506 @@
         }
 
         /**
-         * Boucle principale du jeu, tourne à chaque frame
-         * Elle appelle update() puis draw() indéfiniment.
+         * Boucle principale du jeu, tourne en permanence.
+         * Redirige vers la partie radar quand celle-ci est active.
          */
         function loop() {
-            update();
-            draw();
+            if (!radarPhase) {
+                update();
+                draw();
+            } else {
+                updateRadar();
+                drawRadar();
+            }
             requestAnimationFrame(loop);
         }
 
         loop();
+
+
+        // ════════════════════════════════════════════════════════════════════════════════════════════
+        //                                    PARTIE 2 — RADAR GPS
+        // ════════════════════════════════════════════════════════════════════════════════════════════
+
+        const radarCanvas = document.getElementById('radarCanvas');
+        const rctx = radarCanvas.getContext('2d');
+
+        const COLLECT_RADIUS = 15;
+        const MAX_RADAR_RANGE = 250;
+        const RADAR_TIMER = 60000;
+        const TOTAL_TARGETS = 3;
+
+        let radarGameOver = false;
+        let radarWin = false;
+        let radarTimerStart = 0;
+        let radarTargets = [];
+        let radarCurrentTarget = 0;
+        let radarCollected = 0;
+        let radarSweepAngle = 0;
+        let radarFlash = 0;
+        let currentPos = null;
+        let geoError = null;
+        let watchId = null;
+        let audioCtx = null;
+        let beepTimeout = null;
+        let lastBeepDist = 99999;
+
+        /**
+         * Calcule la distance en mètres entre deux coordonnées GPS
+         * via la formule de Haversine. Suffisamment précis pour quelques centaines de mètres.
+         * @param {number} lat1 @param {number} lng1 @param {number} lat2 @param {number} lng2
+         * @returns {number} Distance en mètres.
+         */
+        function haversine(lat1, lng1, lat2, lng2) {
+            const R = 6371000;
+            const p1 = lat1 * Math.PI / 180;
+            const p2 = lat2 * Math.PI / 180;
+            const dp = (lat2 - lat1) * Math.PI / 180;
+            const dl = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        /**
+         * Calcule le cap (bearing) en degrés du point 1 vers le point 2.
+         * 0° = Nord, 90° = Est, sens horaire.
+         * @param {number} lat1 @param {number} lng1 @param {number} lat2 @param {number} lng2
+         * @returns {number} Cap en degrés [0, 360[.
+         */
+        function bearingTo(lat1, lng1, lat2, lng2) {
+            const p1 = lat1 * Math.PI / 180;
+            const p2 = lat2 * Math.PI / 180;
+            const dl = (lng2 - lng1) * Math.PI / 180;
+            const y = Math.sin(dl) * Math.cos(p2);
+            const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+
+        /**
+         * Génère 3 cibles GPS autour de la position de départ du joueur,
+         * espacées d'environ 80 à 150 mètres, réparties à 120° les unes des autres.
+         * @param {number} baseLat - Latitude de départ.
+         * @param {number} baseLng - Longitude de départ.
+         * @returns {Array} Tableau de 3 objets { lat, lng }.
+         */
+        function generateRadarTargets(baseLat, baseLng) {
+            const cosLat = Math.cos(baseLat * Math.PI / 180);
+            return [0, 1, 2].map(i => {
+                const angle = (i * 120 + Math.random() * 60 - 30) * Math.PI / 180;
+                const dist = 20 + Math.random() * 40;
+                return {
+                    lat: baseLat + (dist / 111320) * Math.cos(angle),
+                    lng: baseLng + (dist / (111320 * cosLat)) * Math.sin(angle)
+                };
+            });
+        }
+
+        /**
+         * Retourne ou crée l'AudioContext partagé.
+         * Le crée en lazy pour respecter la politique des navigateurs
+         * (doit suivre une interaction utilisateur).
+         * @returns {AudioContext}
+         */
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            return audioCtx;
+        }
+
+        /**
+         * Joue un bip radar court avec un léger pitch descendant,
+         * comme un vrai sonar. Fréquence plus haute = cible plus proche.
+         * @param {number} [freq=880] - Fréquence de base en Hz.
+         */
+        function playBeep(freq = 880) {
+            const ac = getAudioCtx();
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ac.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq * 0.65, ac.currentTime + 0.09);
+            gain.gain.setValueAtTime(0.35, ac.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.1);
+            osc.start(ac.currentTime);
+            osc.stop(ac.currentTime + 0.12);
+        }
+
+        /**
+         * Joue un petit jingle de victoire (arpège montant) quand on
+         * collecte une cible. Court et satisfaisant.
+         */
+        function playCollectSound() {
+            const ac = getAudioCtx();
+            [440, 554, 659, 880].forEach((f, i) => {
+                const osc = ac.createOscillator();
+                const gain = ac.createGain();
+                osc.connect(gain);
+                gain.connect(ac.destination);
+                osc.frequency.value = f;
+                osc.type = 'sine';
+                const t = ac.currentTime + i * 0.1;
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+                osc.start(t);
+                osc.stop(t + 0.18);
+            });
+        }
+
+        /**
+         * Donne l'intervalle en ms entre deux bips selon la distance.
+         * Plus on est proche, plus ça bipe vite. À 15m : mode panique.
+         * @param {number} dist - Distance en mètres.
+         * @returns {number} Intervalle en millisecondes.
+         */
+        function beepInterval(dist) {
+            if (dist > 200) return 3000;
+            if (dist > 120) return 2000;
+            if (dist > 70) return 1100;
+            if (dist > 35) return 550;
+            if (dist > COLLECT_RADIUS) return 220;
+            return 100;
+        }
+
+        /**
+         * Programme le prochain bip radar en fonction de la distance actuelle.
+         * Se rappelle toute seule jusqu'à ce qu'on arrête tout.
+         */
+        function scheduleBeep() {
+            if (!radarPhase || radarGameOver || radarWin) return;
+            const dist = lastBeepDist;
+            const freq = dist < 50 ? 1100 : dist < 100 ? 990 : 880;
+            playBeep(freq);
+            beepTimeout = setTimeout(scheduleBeep, beepInterval(dist));
+        }
+
+        /**
+         * Arrête les bips en cours et annule le timeout planifié.
+         */
+        function stopBeeps() {
+            if (beepTimeout) { clearTimeout(beepTimeout); beepTimeout = null; }
+        }
+
+        /**
+         * Arrête le suivi GPS et libère les ressources associées.
+         */
+        function stopGeo() {
+            if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        }
+
+        /**
+         * Lance la phase 2 du jeu. Cache le canvas pigeon, affiche
+         * le canvas radar, demande la géolocalisation et démarre les bips.
+         */
+        function startRadarPhase() {
+            radarPhase = true;
+            radarGameOver = false;
+            radarWin = false;
+            radarCollected = 0;
+            radarCurrentTarget = 0;
+            radarTargets = [];
+            radarTimerStart = Date.now();
+            radarSweepAngle = 0;
+            radarFlash = 0;
+            currentPos = null;
+            geoError = null;
+            lastBeepDist = 99999;
+
+            canvas.style.display = 'none';
+            radarCanvas.style.display = 'block';
+
+            updateTimerBar(1);
+            document.getElementById('hp-fill').setAttribute('width', '0');
+
+            if ('geolocation' in navigator) {
+                watchId = navigator.geolocation.watchPosition(
+                    pos => {
+                        currentPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        if (radarTargets.length === 0) {
+                            radarTargets = generateRadarTargets(currentPos.lat, currentPos.lng);
+                        }
+                    },
+                    err => { geoError = err.message; },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
+            } else {
+                geoError = 'GPS non disponible sur cet appareil.';
+            }
+
+            scheduleBeep();
+        }
+
+        /**
+         * Logique de la partie radar à chaque frame :
+         * mise à jour du timer, calcul de distance, détection de collecte.
+         */
+        function updateRadar() {
+            if (!radarPhase || radarGameOver || radarWin) return;
+
+            const elapsed = Date.now() - radarTimerStart;
+            const ratio = Math.max(0, 1 - elapsed / RADAR_TIMER);
+            updateTimerBar(ratio);
+
+            if (ratio === 0) {
+                radarGameOver = true;
+                stopBeeps();
+                stopGeo();
+                return;
+            }
+
+            radarSweepAngle = (radarSweepAngle + 1.8) % 360;
+
+            if (!currentPos || radarTargets.length === 0) return;
+
+            const target = radarTargets[radarCurrentTarget];
+            const dist = haversine(currentPos.lat, currentPos.lng, target.lat, target.lng);
+            lastBeepDist = dist;
+
+            if (radarFlash > 0) radarFlash--;
+
+            if (dist <= COLLECT_RADIUS) {
+                playCollectSound();
+                radarCollected++;
+                radarFlash = 50;
+
+                const hpFill = document.getElementById('hp-fill');
+                if (hpFill) hpFill.setAttribute('width', ((radarCollected / TOTAL_TARGETS) * HP_BAR_MAX_W).toFixed(1));
+
+                if (radarCollected >= TOTAL_TARGETS) {
+                    radarWin = true;
+                    stopBeeps();
+                    stopGeo();
+                    return;
+                }
+                radarCurrentTarget++;
+            }
+        }
+
+        /**
+         * Dessine l'interface radar : fond sombre, cercle vert animé,
+         * balayage rotatif, blip de la cible, distance et infos en bas.
+         */
+        function drawRadar() {
+            const w = radarCanvas.width;
+            const h = radarCanvas.height;
+            rctx.clearRect(0, 0, w, h);
+
+            rctx.fillStyle = 'rgba(0, 8, 4, 0.92)';
+            rctx.fillRect(0, 0, w, h);
+
+            const cx = w / 2;
+            const cy = h * 0.46;
+            const R = Math.min(w, h) * 0.36;
+
+            rctx.save();
+            rctx.beginPath();
+            rctx.arc(cx, cy, R, 0, Math.PI * 2);
+            rctx.clip();
+
+            rctx.fillStyle = '#010f07';
+            rctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+
+            [0.25, 0.5, 0.75, 1].forEach(s => {
+                rctx.beginPath();
+                rctx.arc(cx, cy, R * s, 0, Math.PI * 2);
+                rctx.strokeStyle = 'rgba(0, 200, 80, 0.18)';
+                rctx.lineWidth = 1;
+                rctx.stroke();
+            });
+
+            rctx.strokeStyle = 'rgba(0, 200, 80, 0.12)';
+            rctx.lineWidth = 1;
+            [-1, 1].forEach(d => {
+                rctx.beginPath(); rctx.moveTo(cx, cy - R); rctx.lineTo(cx, cy + R); rctx.stroke();
+                rctx.beginPath(); rctx.moveTo(cx - R, cy); rctx.lineTo(cx + R, cy); rctx.stroke();
+            });
+
+            const sweepRad = (radarSweepAngle - 90) * Math.PI / 180;
+            const trailRad = 50 * Math.PI / 180;
+
+            rctx.beginPath();
+            rctx.moveTo(cx, cy);
+            rctx.arc(cx, cy, R, sweepRad - trailRad, sweepRad, false);
+            rctx.closePath();
+            const trailGrad = rctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+            trailGrad.addColorStop(0, 'rgba(0, 255, 100, 0.18)');
+            trailGrad.addColorStop(1, 'rgba(0, 255, 100, 0.04)');
+            rctx.fillStyle = trailGrad;
+            rctx.fill();
+
+            rctx.save();
+            rctx.strokeStyle = 'rgba(60, 255, 130, 0.95)';
+            rctx.lineWidth = 2;
+            rctx.shadowColor = 'rgba(60, 255, 130, 0.9)';
+            rctx.shadowBlur = 8;
+            rctx.beginPath();
+            rctx.moveTo(cx, cy);
+            rctx.lineTo(cx + Math.cos(sweepRad) * R, cy + Math.sin(sweepRad) * R);
+            rctx.stroke();
+            rctx.restore();
+
+            if (currentPos && radarTargets.length > 0 && !radarGameOver && !radarWin) {
+                const target = radarTargets[radarCurrentTarget];
+                const dist = haversine(currentPos.lat, currentPos.lng, target.lat, target.lng);
+                const tBearing = bearingTo(currentPos.lat, currentPos.lng, target.lat, target.lng);
+                const relBearing = (tBearing - compassHeading + 360) % 360;
+                const relRad = (relBearing - 90) * Math.PI / 180;
+                const scale = Math.min(1, dist / MAX_RADAR_RANGE);
+                const bx = cx + Math.cos(relRad) * scale * R;
+                const by = cy + Math.sin(relRad) * scale * R;
+
+                const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 180);
+                rctx.save();
+                rctx.shadowColor = 'rgba(255, 240, 0, 0.9)';
+                rctx.shadowBlur = 12 + pulse * 6;
+                rctx.fillStyle = `rgba(255, 230, 0, ${0.75 + pulse * 0.25})`;
+                rctx.beginPath();
+                rctx.arc(bx, by, 5 + pulse * 2.5, 0, Math.PI * 2);
+                rctx.fill();
+                rctx.restore();
+            }
+
+            if (radarFlash > 0) {
+                rctx.fillStyle = `rgba(0, 255, 120, ${(radarFlash / 50) * 0.35})`;
+                rctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+            }
+
+            rctx.restore();
+
+            rctx.save();
+            rctx.strokeStyle = 'rgba(0, 220, 80, 0.7)';
+            rctx.lineWidth = 2.5;
+            rctx.shadowColor = 'rgba(0, 220, 80, 0.5)';
+            rctx.shadowBlur = 10;
+            rctx.beginPath();
+            rctx.arc(cx, cy, R, 0, Math.PI * 2);
+            rctx.stroke();
+            rctx.restore();
+
+            rctx.fillStyle = 'rgba(0, 220, 80, 0.9)';
+            rctx.font = 'bold 11px monospace';
+            rctx.textAlign = 'center';
+            rctx.textBaseline = 'middle';
+            rctx.fillText('N', cx, cy - R + 12);
+            rctx.fillText('S', cx, cy + R - 12);
+            rctx.fillText('E', cx + R - 10, cy);
+            rctx.fillText('O', cx - R + 10, cy);
+
+            rctx.fillStyle = 'rgba(0, 200, 80, 0.6)';
+            rctx.beginPath();
+            rctx.arc(cx, cy, 4, 0, Math.PI * 2);
+            rctx.fill();
+
+            const infoY = cy + R + 24;
+            rctx.textAlign = 'center';
+            rctx.textBaseline = 'top';
+
+            if (geoError) {
+                rctx.fillStyle = '#ff6060';
+                rctx.font = 'bold 14px monospace';
+                rctx.fillText('GPS indisponible', cx, infoY);
+                rctx.fillStyle = '#aaa';
+                rctx.font = '11px monospace';
+                rctx.fillText(geoError, cx, infoY + 20);
+            } else if (!currentPos) {
+                rctx.fillStyle = '#00dc50';
+                rctx.font = 'bold 15px monospace';
+                rctx.fillText('Recherche GPS...', cx, infoY);
+            } else {
+                const target = radarTargets[radarCurrentTarget];
+                const dist = haversine(currentPos.lat, currentPos.lng, target.lat, target.lng);
+                const distStr = dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(2)} km`;
+
+                rctx.fillStyle = '#00dc50';
+                rctx.font = 'bold 22px monospace';
+                rctx.fillText(distStr, cx, infoY);
+
+                rctx.fillStyle = 'rgba(0, 200, 80, 0.7)';
+                rctx.font = '14px monospace';
+                rctx.fillText(`Cibles : ${radarCollected} / ${TOTAL_TARGETS}`, cx, infoY + 32);
+            }
+
+            if (radarGameOver) {
+                rctx.fillStyle = 'rgba(0,0,0,0.65)';
+                rctx.fillRect(0, 0, w, h);
+                rctx.fillStyle = '#FFD700';
+                rctx.font = 'bold 38px monospace';
+                rctx.textAlign = 'center';
+                rctx.textBaseline = 'middle';
+                rctx.fillText('TEMPS ÉCOULÉ !', w / 2, h / 2 - 30);
+                rctx.fillStyle = '#fff';
+                rctx.font = '18px monospace';
+                rctx.fillText('Tape pour réessayer le radar', w / 2, h / 2 + 20);
+            }
+
+            if (radarWin) {
+                rctx.fillStyle = 'rgba(0,0,0,0.65)';
+                rctx.fillRect(0, 0, w, h);
+                rctx.fillStyle = '#00ff80';
+                rctx.font = 'bold 38px monospace';
+                rctx.textAlign = 'center';
+                rctx.textBaseline = 'middle';
+                rctx.fillText('VICTOIRE !', w / 2, h / 2 - 40);
+                rctx.fillStyle = '#fff';
+                rctx.font = '20px monospace';
+                rctx.fillText('Tu as trouvé les 3 cibles.', w / 2, h / 2 + 10);
+                rctx.font = '15px monospace';
+                rctx.fillStyle = 'rgba(255,255,255,0.7)';
+                rctx.fillText('Tape pour rejouer depuis le début', w / 2, h / 2 + 50);
+            }
+        }
+
+        radarCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleRadarTap();
+        }, { passive: false });
+
+        radarCanvas.addEventListener('click', handleRadarTap);
+
+        /**
+         * Gère un tap sur le canvas radar selon l'état actuel :
+         * rejouer le radar, ou retourner complètement au début.
+         */
+        function handleRadarTap() {
+            if (radarWin) {
+                stopBeeps();
+                stopGeo();
+                radarPhase = false;
+                radarCanvas.style.display = 'none';
+                canvas.style.display = 'block';
+                gameStarted = false;
+                gameOver = false;
+                betaBase = null;
+                document.getElementById('start-overlay').style.display = 'flex';
+                return;
+            }
+            if (radarGameOver) {
+                stopBeeps();
+                stopGeo();
+                radarTimerStart = Date.now();
+                radarGameOver = false;
+                radarWin = false;
+                radarCollected = 0;
+                radarCurrentTarget = 0;
+                radarTargets = [];
+                currentPos = null;
+                geoError = null;
+                lastBeepDist = 99999;
+                updateTimerBar(1);
+                document.getElementById('hp-fill').setAttribute('width', '0');
+                if ('geolocation' in navigator) {
+                    watchId = navigator.geolocation.watchPosition(
+                        pos => {
+                            currentPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                            if (radarTargets.length === 0) radarTargets = generateRadarTargets(currentPos.lat, currentPos.lng);
+                        },
+                        err => { geoError = err.message; },
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    );
+                }
+                scheduleBeep();
+            }
+        }
     </script>
 </body>
 
