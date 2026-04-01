@@ -85,6 +85,95 @@
             color: var(--white);
         }
 
+        #pigeon-pause-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 60;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            width: 32px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        #pigeon-pause-btn span {
+            display: block;
+            height: 4px;
+            background: var(--yellow);
+            outline: 2px var(--white) solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pigeon-pause-btn span::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            background: var(--lightyellow);
+            width: 100%;
+            height: 100%;
+        }
+
+        #pigeon-pause-menu {
+            position: fixed;
+            inset: 0;
+            transform: translateX(100%);
+            background: var(--yellow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform .4s ease-in-out;
+            z-index: 50;
+        }
+
+        #pigeon-pause-menu.open {
+            transform: translateX(0);
+        }
+
+        #pigeon-pause-menu ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 56px;
+        }
+
+        #pigeon-pause-menu li {
+            font-size: 28px;
+            font-family: "Retro", monospace;
+        }
+
+        #pigeon-pause-menu li button {
+            font-size: 28px;
+            font-family: "Retro", monospace;
+            color: var(--white);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        #pigeon-pause-menu li button::before {
+            content: '';
+            position: absolute;
+            height: 2px;
+            background: var(--darkyellow);
+            width: 110%;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            top: calc(100% + 4px);
+            transition: transform .4s ease-in-out;
+        }
+
+        #pigeon-pause-menu li button:hover::before {
+            transform: translateX(-50%) scaleX(1);
+        }
+
         #radar-pause-btn {
             position: fixed;
             top: 16px;
@@ -242,6 +331,17 @@
         </g>
     </svg>
 
+    <button id="pigeon-pause-btn" aria-label="Pause">
+        <span></span><span></span><span></span>
+    </button>
+
+    <div id="pigeon-pause-menu">
+        <ul>
+            <li><button id="pigeon-resume-btn">Reprendre</button></li>
+            <li><button id="skip-radar-btn">Passer au radar</button></li>
+        </ul>
+    </div>
+
     <button id="radar-pause-btn" aria-label="Pause">
         <span></span><span></span><span></span>
     </button>
@@ -377,6 +477,7 @@
             if (gameStarted) return;
             gameStarted = true;
             document.getElementById('start-overlay').style.display = 'none';
+            document.getElementById('pigeon-pause-btn').style.display = 'flex';
             init();
         }
 
@@ -468,7 +569,7 @@
          * projectiles et détection des collisions.
          */
         function update() {
-            if (!gameStarted || gameOver) return;
+            if (!gameStarted || gameOver || pigeonPaused) return;
 
             const elapsed = Date.now() - timerStart;
             const ratio = Math.max(0, 1 - elapsed / TIMER_DURATION);
@@ -605,6 +706,38 @@
             }
         }
 
+        let pigeonPaused = false;
+        let pigeonPauseStamp = 0;
+
+        /**
+         * Met le jeu pigeon sur pause et ouvre le menu.
+         */
+        function pausePigeon() {
+            if (!gameStarted || gameOver || pigeonPaused) return;
+            pigeonPaused = true;
+            pigeonPauseStamp = Date.now();
+            document.getElementById('pigeon-pause-menu').classList.add('open');
+        }
+
+        /**
+         * Reprend le jeu pigeon en compensant le temps de pause dans le timer.
+         */
+        function resumePigeon() {
+            if (!pigeonPaused) return;
+            timerStart += Date.now() - pigeonPauseStamp;
+            pigeonPaused = false;
+            document.getElementById('pigeon-pause-menu').classList.remove('open');
+        }
+
+        document.getElementById('pigeon-pause-btn').addEventListener('click', pausePigeon);
+        document.getElementById('pigeon-resume-btn').addEventListener('click', resumePigeon);
+        document.getElementById('skip-radar-btn').addEventListener('click', () => {
+            document.getElementById('pigeon-pause-menu').classList.remove('open');
+            pigeonPaused = false;
+            document.getElementById('pigeon-pause-btn').style.display = 'none';
+            startRadarPhase();
+        });
+
         /**
          * Boucle principale du jeu, tourne en permanence.
          * Redirige vers la partie radar quand celle-ci est active.
@@ -695,7 +828,7 @@
             const cosLat = Math.cos(baseLat * Math.PI / 180);
             return [0, 1, 2].map(i => {
                 const angle = (i * 120 + Math.random() * 60 - 30) * Math.PI / 180;
-                const dist = devMode ? 3 + Math.random() * 2 : 8 + Math.random() * 7;
+                const dist = devMode ? 8 + Math.random() * 2 : 8 + Math.random() * 7;
                 return {
                     lat: baseLat + (dist / 111320) * Math.cos(angle),
                     lng: baseLng + (dist / (111320 * cosLat)) * Math.sin(angle)
@@ -816,6 +949,7 @@
 
             canvas.style.display = 'none';
             radarCanvas.style.display = 'block';
+            document.getElementById('pigeon-pause-btn').style.display = 'none';
             document.getElementById('radar-pause-btn').style.display = 'flex';
 
             updateTimerBar(1);
