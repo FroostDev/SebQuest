@@ -263,9 +263,7 @@
             transform: translateX(-50%) scaleX(1);
         }
 
-        #devmode-btn.dev-on {
-            color: var(--darkyellow);
-        }
+
     </style>
 </head>
 
@@ -349,7 +347,7 @@
     <div id="radar-pause-menu">
         <ul>
             <li><button id="resume-btn">Reprendre</button></li>
-            <li><button id="devmode-btn">Mode Dev : OFF</button></li>
+            <li><button id="win-btn">Gagner la partie</button></li>
             <li><button id="restart-radar-btn">Recommencer</button></li>
         </ul>
     </div>
@@ -617,7 +615,7 @@
 
                 if (p.x < npc.x + NPC_W && p.x + POOP_W > npc.x &&
                     p.y < npc.y + NPC_H && p.y + POOP_H > npc.y) {
-                    hp = Math.max(0, hp - 10);
+                    hp = Math.max(0, hp - 20);
                     updateHPBar();
                     hitFlash = 8;
                     poops.splice(i, 1);
@@ -787,7 +785,7 @@
         let audioCtx = null;
         let beepTimeout = null;
         let lastBeepDist = 99999;
-        let devMode = false;
+
 
         /**
          * Calcule la distance en mètres entre deux coordonnées GPS
@@ -831,7 +829,7 @@
             const cosLat = Math.cos(baseLat * Math.PI / 180);
             return [0, 1, 2].map(i => {
                 const angle = (i * 120 + Math.random() * 60 - 30) * Math.PI / 180;
-                const dist = devMode ? 8 + Math.random() * 2 : 8 + Math.random() * 7;
+                const dist = 8 + Math.random() * 7;
                 return {
                     lat: baseLat + (dist / 111320) * Math.cos(angle),
                     lng: baseLng + (dist / (111320 * cosLat)) * Math.sin(angle)
@@ -1220,20 +1218,16 @@
             scheduleBeep();
         }
 
-        /**
-         * Bascule le mode développeur. En mode dev les cibles sont
-         * placées à 3-5m au lieu de 8-15m, pratique pour tester sans marcher.
-         */
-        function toggleDevMode() {
-            devMode = !devMode;
-            const btn = document.getElementById('devmode-btn');
-            btn.textContent = `Mode Dev : ${devMode ? 'ON' : 'OFF'}`;
-            btn.classList.toggle('dev-on', devMode);
+        function winRadar() {
+            document.getElementById('radar-pause-menu').classList.remove('open');
+            radarWin = true;
+            stopBeeps();
+            stopGeo();
         }
 
         document.getElementById('radar-pause-btn').addEventListener('click', pauseRadar);
         document.getElementById('resume-btn').addEventListener('click', resumeRadar);
-        document.getElementById('devmode-btn').addEventListener('click', toggleDevMode);
+        document.getElementById('win-btn').addEventListener('click', winRadar);
         document.getElementById('restart-radar-btn').addEventListener('click', () => {
             document.getElementById('radar-pause-menu').classList.remove('open');
             handleRadarTap();
