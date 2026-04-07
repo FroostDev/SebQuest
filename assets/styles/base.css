@@ -9,6 +9,10 @@
     font-family: "Retro";
     src: url(fonts/JoyquestSample.ttf);
 }
+@font-face {
+    font-family: "RetroTalk";
+    src: url(fonts/Jersey10-Regular.ttf);
+}
 
 * {
     margin: 0;

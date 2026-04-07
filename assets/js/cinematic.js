@@ -3,8 +3,8 @@ const Cinematic = (() => {
     const TYPEWRITER_SPEED  = 35;
     const BUBBLE_PADDING    = 10;
     const BUBBLE_MAX_WIDTH  = 220;
-    const FONT_SIZE         = 14;
-    const FONT_FAMILY       = '"Retro", monospace';
+    const FONT_SIZE         = 24;
+    const FONT_FAMILY       = '"RetroTalk", monospace';
     const INDICATOR_BLINK   = 500;
     const LINE_HEIGHT       = 1.45;
     const BUBBLE_GAP        = 10;
@@ -20,6 +20,7 @@ const Cinematic = (() => {
     let _bgCache = {};
     let _spriteCache = {};
     let _music = null;
+    let _talkSfx = null;
     let _entities = {};
     let _animQueue = [];
     let _currentAnim = null;
@@ -393,6 +394,10 @@ const Cinematic = (() => {
         _charIdx = 0;
         _revealed = '';
         _typing = true;
+        if (_talkSfx) {
+            _talkSfx.currentTime = 0;
+            _talkSfx.play();
+        }
         clearInterval(_typeTimer);
         _typeTimer = setInterval(() => {
             if (_charIdx < step.text.length) {
@@ -401,6 +406,7 @@ const Cinematic = (() => {
             } else {
                 _typing = false;
                 clearInterval(_typeTimer);
+                if (_talkSfx) _talkSfx.pause();
             }
         }, TYPEWRITER_SPEED);
     }
@@ -415,6 +421,7 @@ const Cinematic = (() => {
         clearInterval(_typeTimer);
         _revealed = step.text;
         _typing = false;
+        if (_talkSfx) _talkSfx.pause();
     }
 
     /**
@@ -556,6 +563,10 @@ const Cinematic = (() => {
         _waitingForActions = false;
         _background = '#0e0e1a';
         _bgImage = null;
+        if (!_talkSfx) {
+            _talkSfx = new Audio('../assets/sound/sfx/talking.mp3');
+            _talkSfx.loop = true;
+        }
 
         clearInterval(_typeTimer);
         if (_animId) cancelAnimationFrame(_animId);
@@ -574,6 +585,7 @@ const Cinematic = (() => {
         clearInterval(_typeTimer);
         if (_animId) { cancelAnimationFrame(_animId); _animId = null; }
         if (_music) { _music.pause(); _music = null; }
+        if (_talkSfx) { _talkSfx.pause(); _talkSfx.currentTime = 0; }
         unbindEvents();
     }
 
