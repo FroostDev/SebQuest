@@ -352,13 +352,106 @@
         </ul>
     </div>
 
-    <div id="start-overlay">
+    <div id="start-overlay" style="display:none">
         <h1>PIGEON ATTACK</h1>
         <p id="controls-hint">Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.</p>
         <button id="start-btn">JOUER</button>
     </div>
 
+    <script src="../assets/js/cinematic.js"></script>
     <script>
+
+        // ══════════════════════════════════════════════════════════
+        //  CINEMATIQUES — Remplis tes dialogues et animations ici !
+        // ══════════════════════════════════════════════════════════
+        //
+        // Chaque step = { background, actions[], speaker, text }
+        //
+        // ACTIONS :
+        //   spawn  : { type:'spawn',  id:'hero', x:.5, y:.7, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'SEB' }
+        //   move   : { type:'move',   id:'hero', x:.3, y:.7, duration:1200 }
+        //   remove : { type:'remove', id:'hero' }
+        //   flip   : { type:'flip',   id:'hero' }
+        //   wait   : { type:'wait',   duration:500 }
+        //   label  : { type:'label',  id:'hero', label:'???' }
+        //
+        // speaker = id de l'entité qui parle → la bulle blanche apparaît au-dessus de sa tête
+        // COORDS : x=0 gauche, x=1 droite, y=0 haut, y=1 bas du canvas. Négatif ou >1 = hors écran.
+
+        // ── Cinématique 1 : INTRO ──
+        const CINE_INTRO = [
+            {
+                background: '../assets/img/backgrounds/jeu_1.jpg',
+                actions: [
+                    { type:'spawn', id:'lehmann', x:-0.1, y:0.9, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
+                    { type:'move',  id:'lehmann', x:0.20, duration:1500 },
+                ],
+                speaker: 'lehmann',
+                text: "Mais il est super ce parc !",
+            },
+            {
+                actions: [
+                    { type:'spawn', id:'npc', x:1.1, y:0.7, w:46, h:50, color:'#e8863a', highlight:'#f0a060', outline:'#b05818', label:'NPC' },
+                    { type:'move',  id:'npc', x:0.80, duration:1000 },
+                ],
+                speaker: 'npc',
+                text: "JE SUIS LE DOCTEUR BENNER ! LE MAITRE DE CES LIEUX ! J'AI DEVELO...",
+            },
+            {
+                speaker: 'lehmann',
+                text: "ATTEND ! Tu as bien dis developper ? Oh ! J'en ai une !",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Que dis un dev qui a oublie de definir sa liste en HTML ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Qu'est ce que tu me raconte la ?",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Il manque ul ! HAHAHAHAHA",
+            },
+            {
+                speaker: 'npc',
+                text: "Tu te fou de moi ? En racontant ce genre de blagues sans aucuns goûts dans mon parc, tu manque de respect au personnes pour qui j'ai crée ce parc !",
+            },
+            {
+                speaker: 'npc',
+                text: "Je vais te montrer ce que ça fait d'être aveugle !",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Aveugle ?",
+            },
+        ];
+
+        // ── Cinématique 2 : TRANSITION ──
+        const CINE_TRANSITION = [
+            {
+                background: '#0e0e1a',
+                actions: [
+                    { type:'spawn', id:'hero', x:0.5, y:0.7, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
+                ],
+                speaker: 'hero',
+                text: "...",
+            },
+        ];
+
+        // ── Cinématique 3 : FIN ──
+        const CINE_END = [
+            {
+                background: '#0e0e1a',
+                actions: [
+                    { type:'spawn', id:'hero', x:0.5, y:0.7, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
+                ],
+                speaker: 'hero',
+                text: "...",
+            },
+        ];
+
+
         // ════════════════════════════════════════════════════════════════
         //                       PARTIE 1 — PIGEON
         // ════════════════════════════════════════════════════════════════
@@ -397,6 +490,7 @@
         let radarPhase = false;
         let pigeonPaused = false;
         let pigeonPauseStamp = 0;
+        let _nextPhase = 'pigeon';
         const keys = {};
         const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
@@ -517,29 +611,27 @@
             } else {
                 listenOrientation();
             }
-            startGame();
+            document.getElementById('start-overlay').style.display = 'none';
+            if (_nextPhase === 'radar') {
+                _launchRadar();
+            } else {
+                startGame();
+            }
         });
 
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            if (!gameStarted) {
-                startGame();
-            } else if (gameOver) {
+        function handleCanvasInput(e) {
+            if (e.type === 'touchstart') e.preventDefault();
+            if (Cinematic.isPlaying()) return;
+            if (document.getElementById('start-overlay').style.display !== 'none') return;
+            if (!gameStarted) return;
+            if (gameOver) {
                 init();
             } else {
                 shootPoop();
             }
-        }, { passive: false });
-
-        canvas.addEventListener('click', () => {
-            if (!gameStarted) {
-                startGame();
-            } else if (gameOver) {
-                init();
-            } else {
-                shootPoop();
-            }
-        });
+        }
+        canvas.addEventListener('touchstart', handleCanvasInput, { passive: false });
+        canvas.addEventListener('click', handleCanvasInput);
 
         /**
          * Suit les touches clavier enfoncées pour les contrôles PC.
@@ -744,6 +836,11 @@
          * Redirige vers la partie radar quand celle-ci est active.
          */
         function loop() {
+            // Ne rien dessiner si une cinématique tourne
+            if (Cinematic.isPlaying()) {
+                requestAnimationFrame(loop);
+                return;
+            }
             if (!radarPhase) {
                 update();
                 draw();
@@ -756,6 +853,11 @@
 
         loop();
 
+        // Lancer la cinématique d'intro dès le chargement, puis afficher le menu
+        Cinematic.play(canvas, CINE_INTRO, () => {
+            document.getElementById('start-overlay').style.display = 'flex';
+        });
+
 
         // ════════════════════════════════════════════════════════════════════════════════════════════
         //                                    PARTIE 2 — RADAR GPS
@@ -765,7 +867,7 @@
         const rctx = radarCanvas.getContext('2d');
 
         const COLLECT_RADIUS = 3;
-        const MAX_RADAR_RANGE = 250;
+        const MAX_RADAR_RANGE = 30;
         const RADAR_TIMER = 60000;
         const TOTAL_TARGETS = 3;
 
@@ -935,6 +1037,23 @@
          * le canvas radar, demande la géolocalisation et démarre les bips.
          */
         function startRadarPhase() {
+            gameStarted = false;
+            document.getElementById('pigeon-pause-btn').style.display = 'none';
+            Cinematic.play(canvas, CINE_TRANSITION, () => {
+                // Afficher le menu avant de lancer le radar
+                const overlay = document.getElementById('start-overlay');
+                overlay.querySelector('h1').textContent = 'RADAR GPS';
+                document.getElementById('controls-hint').innerHTML = isMobile
+                    ? 'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.'
+                    : 'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.';
+                document.getElementById('start-btn').textContent = 'JOUER';
+                overlay.style.display = 'flex';
+                // Le bouton JOUER lancera le radar
+                _nextPhase = 'radar';
+            });
+        }
+
+        function _launchRadar() {
             radarPhase = true;
             radarGameOver = false;
             radarWin = false;
@@ -1279,10 +1398,14 @@
                 canvas.style.display = 'block';
                 document.getElementById('radar-pause-btn').style.display = 'none';
                 document.getElementById('radar-pause-menu').classList.remove('open');
-                gameStarted = false;
-                gameOver = false;
-                betaBase = null;
-                document.getElementById('start-overlay').style.display = 'flex';
+
+                // Jouer la cinématique de fin, puis retour au menu
+                Cinematic.play(canvas, CINE_END, () => {
+                    gameStarted = false;
+                    gameOver = false;
+                    betaBase = null;
+                    document.getElementById('start-overlay').style.display = 'flex';
+                });
                 return;
             }
             if (radarGameOver) {
