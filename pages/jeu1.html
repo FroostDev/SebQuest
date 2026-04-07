@@ -266,6 +266,10 @@
 </head>
 
 <body>
+    <div id="game-launch-overlay" style="position:fixed;inset:0;z-index:999999;backdrop-filter:blur(20px);display:flex;justify-content:center;align-items:center;">
+        <button id="game-launch-btn" class="yellow_btn_style" style="font-family:'Retro',monospace;font-size:1.4rem;padding:16px 48px;">Commencer</button>
+    </div>
+
     <canvas id="gameCanvas"></canvas>
     <canvas id="radarCanvas"></canvas>
 
@@ -860,9 +864,19 @@
 
         loop();
 
-        // Lancer la cinématique d'intro dès le chargement, puis afficher le menu
-        Cinematic.play(canvas, CINE_INTRO, () => {
-            document.getElementById('start-overlay').style.display = 'flex';
+        // Le bouton "Commencer" est la première interaction obligatoire.
+        // On en profite pour déverrouiller l'audio (talking.mp3) via play+pause,
+        // puis on lance la cinématique d'intro.
+        document.getElementById('game-launch-btn').addEventListener('click', () => {
+            const overlay = document.getElementById('game-launch-overlay');
+            overlay.style.display = 'none';
+
+            const sfxUnlock = new Audio('../assets/sound/sfx/talking.mp3');
+            sfxUnlock.play().then(() => sfxUnlock.pause()).catch(() => {});
+
+            Cinematic.play(canvas, CINE_INTRO, () => {
+                document.getElementById('start-overlay').style.display = 'flex';
+            });
         });
 
 
