@@ -5,6 +5,7 @@ const nav = document.querySelector("#nav");
 
 function playMusic(sound) {
     const music = new Audio(sound);
+    music.loop = true;
     music.play();
 }
 

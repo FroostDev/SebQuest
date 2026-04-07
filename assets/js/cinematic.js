@@ -1,42 +1,15 @@
-// ════════════════════════════════════════════════════════════════
-//                    MOTEUR DE CINEMATIQUES
-// ════════════════════════════════════════════════════════════════
-//
-// Usage :
-//   Cinematic.play(canvas, steps, onComplete)
-//
-// Format d'un step :
-//   {
-//     background: '#0e0e1a',           // couleur ou chemin image (optionnel, garde le précédent)
-//     actions: [                        // animations AVANT le dialogue (optionnel)
-//       { type:'spawn',  id:'hero', x:.3, y:.7, w:88, h:64, color:'#b4cde8', ... },
-//       { type:'move',   id:'hero', x:.5, duration:1200 },
-//       { type:'remove', id:'hero' },
-//       { type:'wait',   duration:500 },
-//       { type:'flip',   id:'hero' },
-//       { type:'label',  id:'hero', label:'SEB' },
-//     ],
-//     speaker: 'hero',                 // id de l'entité qui parle → bulle au-dessus de sa tête
-//     text: "Salut !",                 // texte typewriter
-//   }
-//
-// Coords x/y : 0-1 relatifs au canvas entier. x=0 gauche, x=1 droite, y=0 haut, y=1 bas.
-//   Négatif ou >1 = hors écran. On positionne le CENTRE du perso.
-
 const Cinematic = (() => {
 
-    // ── CONFIG ───────────────────────────────────────────────
-    const TYPEWRITER_SPEED  = 35;   // ms par lettre
+    const TYPEWRITER_SPEED  = 35;
     const BUBBLE_PADDING    = 10;
-    const BUBBLE_MAX_WIDTH  = 220;  // largeur max de la bulle en px
+    const BUBBLE_MAX_WIDTH  = 220;
     const FONT_SIZE         = 14;
     const FONT_FAMILY       = '"Retro", monospace';
     const INDICATOR_BLINK   = 500;
     const LINE_HEIGHT       = 1.45;
-    const BUBBLE_GAP        = 10;   // espace entre la tête du perso et la bulle
-    const TAIL_SIZE         = 8;    // taille du petit triangle
+    const BUBBLE_GAP        = 10;
+    const TAIL_SIZE         = 8;
 
-    // ── ETAT ─────────────────────────────────────────────────
     let _ctx, _canvas, _steps, _onComplete;
     let _stepIdx, _charIdx, _revealed;
     let _typing, _typeTimer;
@@ -45,19 +18,22 @@ const Cinematic = (() => {
     let _background = '#0e0e1a';
     let _bgImage = null;
     let _bgCache = {};
-
-    // Personnages vivants (persistent entre les steps)
+    let _music = null;
     let _entities = {};
-
-    // Animation en cours
     let _animQueue = [];
     let _currentAnim = null;
     let _animStart = 0;
     let _waitingForActions = false;
 
-    // ── UTILITAIRES ──────────────────────────────────────────
-
-    /** Convertit coords relatives (0-1) en pixels sur le canvas entier. */
+    /**
+     * Convertit des coordonnées relatives (0-1) en pixels
+     * sur le canvas. Le point d'ancrage est le centre de l'entité.
+     * @param {number} rx - Position X relative (0 = gauche, 1 = droite).
+     * @param {number} ry - Position Y relative (0 = haut, 1 = bas).
+     * @param {number} ew - Largeur de l'entité en pixels.
+     * @param {number} eh - Hauteur de l'entité en pixels.
+     * @returns {{px: number, py: number}} Position en pixels.
+     */
     function toPixel(rx, ry, ew, eh) {
         return {
             px: rx * _canvas.width - ew / 2,
@@ -65,7 +41,13 @@ const Cinematic = (() => {
         };
     }
 
-    /** Découpe un texte en lignes qui tiennent dans maxW pixels. */
+    /**
+     * Découpe un texte en plusieurs lignes pour qu'il
+     * tienne dans la largeur maximale donnée.
+     * @param {string} text - Le texte à découper.
+     * @param {number} maxW - Largeur maximale en pixels.
+     * @returns {string[]} Tableau de lignes.
+     */
     function wrapText(text, maxW) {
         const words = text.split(' ');
         const lines = [];
@@ -83,8 +65,12 @@ const Cinematic = (() => {
         return lines;
     }
 
-    // ── ACTIONS / ANIMATIONS ─────────────────────────────────
-
+    /**
+     * Traite la file d'actions du step courant frame par frame.
+     * Gère les animations de déplacement avec easing, les spawns,
+     * les suppressions, les flips, les waits et les labels.
+     * Passe au dialogue une fois toutes les actions terminées.
+     */
     function processActions() {
         if (!_active) return;
 
@@ -162,15 +148,17 @@ const Cinematic = (() => {
         processActions();
     }
 
-    // ── RENDU ────────────────────────────────────────────────
-
+    /**
+     * Boucle de rendu principale de la cinématique.
+     * Dessine le fond, toutes les entités vivantes, et la bulle
+     * de dialogue au-dessus du speaker avec l'effet typewriter.
+     */
     function render() {
         if (!_active) return;
         const w = _canvas.width;
         const h = _canvas.height;
         const step = _steps[_stepIdx];
 
-        // ── Fond
         if (_bgImage && _bgImage.complete) {
             _ctx.drawImage(_bgImage, 0, 0, w, h);
         } else {
@@ -178,7 +166,6 @@ const Cinematic = (() => {
             _ctx.fillRect(0, 0, w, h);
         }
 
-        // ── Entités
         if (_waitingForActions) processActions();
 
         for (const id in _entities) {
@@ -216,7 +203,6 @@ const Cinematic = (() => {
             _ctx.restore();
         }
 
-        // ── Bulle de dialogue au-dessus du speaker
         if (!_waitingForActions && step.text && step.speaker) {
             const speakerEntity = _entities[step.speaker];
             if (speakerEntity) {
@@ -233,7 +219,6 @@ const Cinematic = (() => {
                 const textH = fullLines.length * lineH;
                 const bubbleH = textH + BUBBLE_PADDING * 2;
 
-                // Largeur = la plus large ligne du texte complet (pour pas que ca bouge)
                 let maxLineW = 0;
                 for (const l of fullLines) {
                     const lw = _ctx.measureText(l).width;
@@ -241,22 +226,18 @@ const Cinematic = (() => {
                 }
                 const bubbleW = maxLineW + BUBBLE_PADDING * 2;
 
-                // Position de la bulle : centrée au-dessus du perso
                 let bubbleX = centerX - bubbleW / 2;
                 const bubbleY = topY - BUBBLE_GAP - TAIL_SIZE - bubbleH;
 
-                // Clamp pour pas sortir de l'écran
                 if (bubbleX < 6) bubbleX = 6;
                 if (bubbleX + bubbleW > w - 6) bubbleX = w - 6 - bubbleW;
 
-                // Bulle blanche pixel art
                 _ctx.fillStyle = '#fff';
                 _ctx.fillRect(bubbleX, bubbleY, bubbleW, bubbleH);
                 _ctx.strokeStyle = '#222';
                 _ctx.lineWidth = 2;
                 _ctx.strokeRect(bubbleX, bubbleY, bubbleW, bubbleH);
 
-                // Petit triangle vers le perso
                 const tailX = Math.max(bubbleX + 12, Math.min(centerX, bubbleX + bubbleW - 12));
                 _ctx.fillStyle = '#fff';
                 _ctx.beginPath();
@@ -265,7 +246,6 @@ const Cinematic = (() => {
                 _ctx.lineTo(tailX + TAIL_SIZE, bubbleY + bubbleH);
                 _ctx.closePath();
                 _ctx.fill();
-                // Bords du triangle
                 _ctx.strokeStyle = '#222';
                 _ctx.lineWidth = 2;
                 _ctx.beginPath();
@@ -273,11 +253,9 @@ const Cinematic = (() => {
                 _ctx.lineTo(tailX, bubbleY + bubbleH + TAIL_SIZE);
                 _ctx.lineTo(tailX + TAIL_SIZE, bubbleY + bubbleH);
                 _ctx.stroke();
-                // Cacher la ligne du haut du triangle (overlap avec la bulle)
                 _ctx.fillStyle = '#fff';
                 _ctx.fillRect(tailX - TAIL_SIZE, bubbleY + bubbleH - 2, TAIL_SIZE * 2, 4);
 
-                // Texte
                 _ctx.font = `${FONT_SIZE}px ${FONT_FAMILY}`;
                 _ctx.fillStyle = '#1a1a1a';
                 _ctx.textAlign = 'left';
@@ -286,7 +264,6 @@ const Cinematic = (() => {
                     _ctx.fillText(visLines[i], bubbleX + BUBBLE_PADDING, bubbleY + BUBBLE_PADDING + i * lineH);
                 }
 
-                // ▼ clignotant
                 if (!_typing) {
                     const blink = Math.floor(Date.now() / INDICATOR_BLINK) % 2 === 0;
                     if (blink) {
@@ -303,8 +280,11 @@ const Cinematic = (() => {
         _animId = requestAnimationFrame(render);
     }
 
-    // ── TYPEWRITER ───────────────────────────────────────────
-
+    /**
+     * Démarre l'effet typewriter sur le texte du step courant.
+     * Ajoute une lettre toutes les TYPEWRITER_SPEED ms.
+     * S'il n'y a pas de texte, passe automatiquement au step suivant.
+     */
     function startTyping() {
         const step = _steps[_stepIdx];
         if (!step || !step.text) {
@@ -330,6 +310,10 @@ const Cinematic = (() => {
         }, TYPEWRITER_SPEED);
     }
 
+    /**
+     * Affiche immédiatement tout le texte du step courant,
+     * annulant l'effet typewriter en cours.
+     */
     function skipTyping() {
         const step = _steps[_stepIdx];
         if (!step || !step.text) return;
@@ -338,8 +322,11 @@ const Cinematic = (() => {
         _typing = false;
     }
 
-    // ── NAVIGATION ───────────────────────────────────────────
-
+    /**
+     * Initialise un nouveau step : met à jour le fond,
+     * charge la musique si spécifiée, puis lance les actions
+     * ou le dialogue selon le contenu du step.
+     */
     function beginStep() {
         const step = _steps[_stepIdx];
         if (!step) return;
@@ -360,6 +347,15 @@ const Cinematic = (() => {
             }
         }
 
+        if (step.music !== undefined) {
+            if (_music) { _music.pause(); _music = null; }
+            if (step.music) {
+                _music = new Audio(step.music);
+                _music.loop = true;
+                _music.play();
+            }
+        }
+
         if (step.actions && step.actions.length > 0) {
             _animQueue = [...step.actions];
             _waitingForActions = true;
@@ -370,6 +366,10 @@ const Cinematic = (() => {
         }
     }
 
+    /**
+     * Passe au step suivant, ou termine la cinématique
+     * si c'était le dernier step.
+     */
     function advanceStep() {
         if (_stepIdx < _steps.length - 1) {
             _stepIdx++;
@@ -380,6 +380,11 @@ const Cinematic = (() => {
         }
     }
 
+    /**
+     * Appelée quand le joueur interagit (tap, clic, espace).
+     * Skip le typewriter si en cours, sinon passe au step suivant.
+     * Bloquée tant que des actions sont en cours d'animation.
+     */
     function advance() {
         if (!_active) return;
         if (_waitingForActions) return;
@@ -392,13 +397,20 @@ const Cinematic = (() => {
         advanceStep();
     }
 
-    // ── EVENTS ───────────────────────────────────────────────
-
+    /**
+     * Gère les taps et clics sur le canvas pendant la cinématique.
+     * @param {Event} e - L'événement tactile ou souris.
+     */
     function onTap(e) {
         if (e.type === 'touchstart') e.preventDefault();
         advance();
     }
 
+    /**
+     * Gère les touches clavier pendant la cinématique.
+     * Espace et Entrée font avancer le dialogue.
+     * @param {KeyboardEvent} e - L'événement clavier.
+     */
     function onKey(e) {
         if (e.key === ' ' || e.key === 'Enter') {
             e.preventDefault();
@@ -406,20 +418,32 @@ const Cinematic = (() => {
         }
     }
 
+    /**
+     * Attache les écouteurs d'événements sur le canvas
+     * et le clavier pour naviguer dans la cinématique.
+     */
     function bindEvents() {
         _canvas.addEventListener('click', onTap);
         _canvas.addEventListener('touchstart', onTap, { passive: false });
         window.addEventListener('keydown', onKey);
     }
 
+    /**
+     * Détache tous les écouteurs posés par bindEvents.
+     */
     function unbindEvents() {
         _canvas.removeEventListener('click', onTap);
         _canvas.removeEventListener('touchstart', onTap);
         window.removeEventListener('keydown', onKey);
     }
 
-    // ── API PUBLIQUE ─────────────────────────────────────────
-
+    /**
+     * Lance une cinématique sur le canvas donné.
+     * Réinitialise tout l'état interne et démarre le premier step.
+     * @param {HTMLCanvasElement} canvas - Le canvas de rendu.
+     * @param {Array} steps - Tableau de steps décrivant la cinématique.
+     * @param {Function} onComplete - Callback appelé à la fin de la cinématique.
+     */
     function play(canvas, steps, onComplete) {
         _canvas = canvas;
         _ctx = canvas.getContext('2d');
@@ -445,13 +469,22 @@ const Cinematic = (() => {
         render();
     }
 
+    /**
+     * Stoppe immédiatement la cinématique en cours :
+     * arrête le rendu, le typewriter, la musique et les événements.
+     */
     function stop() {
         _active = false;
         clearInterval(_typeTimer);
         if (_animId) { cancelAnimationFrame(_animId); _animId = null; }
+        if (_music) { _music.pause(); _music = null; }
         unbindEvents();
     }
 
+    /**
+     * Indique si une cinématique est actuellement en cours de lecture.
+     * @returns {boolean}
+     */
     function isPlaying() {
         return _active;
     }
