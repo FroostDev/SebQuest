@@ -18,12 +18,26 @@ const Cinematic = (() => {
     let _background = '#0e0e1a';
     let _bgImage = null;
     let _bgCache = {};
+    let _spriteCache = {};
     let _music = null;
     let _entities = {};
     let _animQueue = [];
     let _currentAnim = null;
     let _animStart = 0;
     let _waitingForActions = false;
+
+    /**
+     * Charge ou récupère depuis le cache une image de spritesheet.
+     * @param {string} src - Chemin vers l'image.
+     * @returns {HTMLImageElement} L'objet Image (peut ne pas être encore chargé).
+     */
+    function getSprite(src) {
+        if (_spriteCache[src]) return _spriteCache[src];
+        const img = new Image();
+        img.src = src;
+        _spriteCache[src] = img;
+        return img;
+    }
 
     /**
      * Convertit des coordonnées relatives (0-1) en pixels
@@ -66,9 +80,27 @@ const Cinematic = (() => {
     }
 
     /**
+     * Retourne la taille affichée d'une entité en pixels,
+     * en tenant compte du scale et de l'animation courante.
+     * @param {Object} e - L'entité.
+     * @returns {{dw: number, dh: number}} Dimensions affichées.
+     */
+    function entityDisplaySize(e) {
+        if (e.sprite && e.anims && e.anim) {
+            const a = e.anims[e.anim];
+            if (a) {
+                const s = e.scale || 1;
+                return { dw: a.frameW * s, dh: a.frameH * s };
+            }
+        }
+        return { dw: e.w, dh: e.h };
+    }
+
+    /**
      * Traite la file d'actions du step courant frame par frame.
      * Gère les animations de déplacement avec easing, les spawns,
-     * les suppressions, les flips, les waits et les labels.
+     * les suppressions, les flips, les waits, les labels et
+     * les changements d'animation sprite.
      * Passe au dialogue une fois toutes les actions terminées.
      */
     function processActions() {
@@ -98,7 +130,7 @@ const Cinematic = (() => {
 
         switch (action.type) {
             case 'spawn': {
-                _entities[action.id] = {
+                const ent = {
                     x: action.x ?? 0.5,
                     y: action.y ?? 0.5,
                     w: action.w || 44,
@@ -108,7 +140,19 @@ const Cinematic = (() => {
                     outline: action.outline || '#6a94be',
                     label: action.label || null,
                     flip: action.flip || false,
+                    sprite: null,
+                    anims: null,
+                    anim: null,
+                    scale: action.scale || 1,
+                    frame: 0,
+                    lastFrameTime: 0,
                 };
+                if (action.sprite && action.anims) {
+                    ent.sprite = getSprite(action.sprite);
+                    ent.anims = action.anims;
+                    ent.anim = action.anim || Object.keys(action.anims)[0];
+                }
+                _entities[action.id] = ent;
                 break;
             }
             case 'move': {
@@ -143,33 +187,57 @@ const Cinematic = (() => {
                 if (e) e.label = action.label;
                 break;
             }
+            case 'anim': {
+                const e = _entities[action.id];
+                if (e && e.anims && e.anims[action.anim]) {
+                    if (e.anim !== action.anim) {
+                        e.anim = action.anim;
+                        e.frame = 0;
+                        e.lastFrameTime = 0;
+                    }
+                }
+                break;
+            }
         }
 
         processActions();
     }
 
     /**
-     * Boucle de rendu principale de la cinématique.
-     * Dessine le fond, toutes les entités vivantes, et la bulle
-     * de dialogue au-dessus du speaker avec l'effet typewriter.
+     * Dessine une entité sur le canvas : soit un sprite animé
+     * depuis une spritesheet, soit un rectangle coloré de fallback.
+     * @param {Object} e - L'entité à dessiner.
+     * @param {number} now - Timestamp courant pour l'avancement des frames.
      */
-    function render() {
-        if (!_active) return;
-        const w = _canvas.width;
-        const h = _canvas.height;
-        const step = _steps[_stepIdx];
+    function drawEntity(e, now) {
+        const hasSprite = e.sprite && e.sprite.complete && e.sprite.naturalWidth > 0
+                          && e.anims && e.anim && e.anims[e.anim];
 
-        if (_bgImage && _bgImage.complete) {
-            _ctx.drawImage(_bgImage, 0, 0, w, h);
+        if (hasSprite) {
+            const a = e.anims[e.anim];
+            const s = e.scale || 1;
+            const dw = a.frameW * s;
+            const dh = a.frameH * s;
+            const pos = toPixel(e.x, e.y, dw, dh);
+
+            if (a.fps > 0 && a.frames > 1 && now - e.lastFrameTime > 1000 / a.fps) {
+                e.frame = (e.frame + 1) % a.frames;
+                e.lastFrameTime = now;
+            }
+
+            const srcX = e.frame * a.frameW;
+            const srcY = a.srcY;
+
+            _ctx.save();
+            if (e.flip) {
+                _ctx.translate(pos.px + dw, pos.py);
+                _ctx.scale(-1, 1);
+                _ctx.drawImage(e.sprite, srcX, srcY, a.frameW, a.frameH, 0, 0, dw, dh);
+            } else {
+                _ctx.drawImage(e.sprite, srcX, srcY, a.frameW, a.frameH, pos.px, pos.py, dw, dh);
+            }
+            _ctx.restore();
         } else {
-            _ctx.fillStyle = _background;
-            _ctx.fillRect(0, 0, w, h);
-        }
-
-        if (_waitingForActions) processActions();
-
-        for (const id in _entities) {
-            const e = _entities[id];
             const pos = toPixel(e.x, e.y, e.w, e.h);
 
             _ctx.save();
@@ -202,12 +270,39 @@ const Cinematic = (() => {
 
             _ctx.restore();
         }
+    }
+
+    /**
+     * Boucle de rendu principale de la cinématique.
+     * Dessine le fond, toutes les entités vivantes, et la bulle
+     * de dialogue au-dessus du speaker avec l'effet typewriter.
+     */
+    function render() {
+        if (!_active) return;
+        const w = _canvas.width;
+        const h = _canvas.height;
+        const step = _steps[_stepIdx];
+        const now = performance.now();
+
+        if (_bgImage && _bgImage.complete) {
+            _ctx.drawImage(_bgImage, 0, 0, w, h);
+        } else {
+            _ctx.fillStyle = _background;
+            _ctx.fillRect(0, 0, w, h);
+        }
+
+        if (_waitingForActions) processActions();
+
+        for (const id in _entities) {
+            drawEntity(_entities[id], now);
+        }
 
         if (!_waitingForActions && step.text && step.speaker) {
             const speakerEntity = _entities[step.speaker];
             if (speakerEntity) {
-                const pos = toPixel(speakerEntity.x, speakerEntity.y, speakerEntity.w, speakerEntity.h);
-                const centerX = pos.px + speakerEntity.w / 2;
+                const size = entityDisplaySize(speakerEntity);
+                const pos = toPixel(speakerEntity.x, speakerEntity.y, size.dw, size.dh);
+                const centerX = pos.px + size.dw / 2;
                 const topY = pos.py;
 
                 _ctx.font = `${FONT_SIZE}px ${FONT_FAMILY}`;
@@ -447,6 +542,7 @@ const Cinematic = (() => {
     function play(canvas, steps, onComplete) {
         _canvas = canvas;
         _ctx = canvas.getContext('2d');
+        _ctx.imageSmoothingEnabled = false;
         _steps = steps;
         _onComplete = onComplete;
         _stepIdx = 0;

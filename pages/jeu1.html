@@ -262,8 +262,6 @@
         #radar-pause-menu li button:hover::before {
             transform: translateX(-50%) scaleX(1);
         }
-
-
     </style>
 </head>
 
@@ -383,16 +381,25 @@
             {
                 background: '../assets/img/backgrounds/jeu_1.jpg',
                 actions: [
-                    { type:'spawn', id:'lehmann', x:-0.1, y:0.9, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
-                    { type:'move',  id:'lehmann', x:0.20, duration:1500 },
+                    {
+                        type: 'spawn', id: 'lehmann', x: -0.1, y: 0.88, scale: 0.5, sprite: '../f.jpg', anims: {
+                            idle: { srcY: 0, frames: 8, fps: 8, frameW: 127, frameH: 290 },
+                            walk: { srcY: 340, frames: 8, fps: 14, frameW: 127, frameH: 280 },
+                            jump: { srcY: 680, frames: 6, fps: 12, frameW: 169, frameH: 340 },
+                        },
+                        anim: 'idle'
+                    },
+                    { type: 'anim', id: 'lehmann', anim:'walk' },
+                    { type: 'move', id: 'lehmann', x: 0.20, duration: 1500 },
+                    { type: 'anim', id: 'lehmann', anim:'idle' },
                 ],
                 speaker: 'lehmann',
                 text: "Mais il est super ce parc !",
             },
             {
                 actions: [
-                    { type:'spawn', id:'npc', x:1.1, y:0.7, w:46, h:50, color:'#e8863a', highlight:'#f0a060', outline:'#b05818', label:'NPC' },
-                    { type:'move',  id:'npc', x:0.80, duration:1000 },
+                    { type: 'spawn', id: 'npc', x: 1.1, y: 0.88, w: 46, h: 50, color: '#e8863a', highlight: '#f0a060', outline: '#b05818', label: 'NPC' },
+                    { type: 'move', id: 'npc', x: 0.80, duration: 1000 },
                 ],
                 speaker: 'npc',
                 text: "JE SUIS LE DOCTEUR BENNER ! LE MAITRE DE CES LIEUX ! J'AI DEVELO...",
@@ -432,7 +439,7 @@
             {
                 background: '#0e0e1a',
                 actions: [
-                    { type:'spawn', id:'hero', x:0.5, y:0.7, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
+                    { type: 'spawn', id: 'hero', x: 0.5, y: 0.7, w: 88, h: 64, color: '#b4cde8', highlight: '#d8eaf8', outline: '#6a94be', label: 'PIGEON' },
                 ],
                 speaker: 'hero',
                 text: "...",
@@ -444,7 +451,7 @@
             {
                 background: '#0e0e1a',
                 actions: [
-                    { type:'spawn', id:'hero', x:0.5, y:0.7, w:88, h:64, color:'#b4cde8', highlight:'#d8eaf8', outline:'#6a94be', label:'PIGEON' },
+                    { type: 'spawn', id: 'hero', x: 0.5, y: 0.7, w: 88, h: 64, color: '#b4cde8', highlight: '#d8eaf8', outline: '#6a94be', label: 'PIGEON' },
                 ],
                 speaker: 'hero',
                 text: "...",
@@ -607,7 +614,7 @@
                 typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(res => { if (res === 'granted') listenOrientation(); })
-                    .catch(() => {});
+                    .catch(() => { });
             } else {
                 listenOrientation();
             }
