@@ -452,7 +452,8 @@ const Cinematic = (() => {
         if (step.music !== undefined) {
             if (_music) { _music.pause(); _music = null; }
             if (step.music) {
-                _music = new Audio(step.music);
+                _music = new Audio(step.music[0]);
+                _music.volume = step.music[1];
                 _music.loop = true;
                 _music.play();
             }

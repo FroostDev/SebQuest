@@ -266,8 +266,10 @@
 </head>
 
 <body>
-    <div id="game-launch-overlay" style="position:fixed;inset:0;z-index:999999;backdrop-filter:blur(20px);display:flex;justify-content:center;align-items:center;">
-        <button id="game-launch-btn" class="yellow_btn_style" style="font-family:'Retro',monospace;font-size:1.4rem;padding:16px 48px;">Commencer</button>
+    <div id="game-launch-overlay"
+        style="position:fixed;inset:0;z-index:999999;backdrop-filter:blur(20px);display:flex;justify-content:center;align-items:center;">
+        <button id="game-launch-btn" class="yellow_btn_style"
+            style="font-family:'Retro',monospace;font-size:1.4rem;padding:16px 48px;">Commencer</button>
     </div>
 
     <canvas id="gameCanvas"></canvas>
@@ -387,7 +389,7 @@
                 music: ['../assets/sound/music/discussion.mp3', 0.2],
                 actions: [
                     {
-                        type: 'spawn', id: 'lehmann', x: -0.1, y: 0.88, scale: 0.5, sprite: '../f.jpg', anims: {
+                        type: 'spawn', id: 'lehmann', x: -0.1, y: 0.84, scale: 0.5, sprite: '../f.jpg', anims: {
                             idle: { srcY: 0, frames: 8, fps: 8, frameW: 127, frameH: 290 },
                             walk: { srcY: 340, frames: 8, fps: 14, frameW: 127, frameH: 280 },
                             jump: { srcY: 680, frames: 6, fps: 12, frameW: 169, frameH: 340 },
@@ -404,13 +406,10 @@
             {
                 actions: [
                     {
-                        type: 'spawn', id: 'npc', x: 1.1, y: 0.88, scale: 1, flip: true,
-                        sprite: '../assets/img/characters/benner.png',
-                        anims: {
-                            idle: { srcY: 66,  frames: 4, fps: 4, frameW: 93, frameH: 158 },
-                            cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
-                        },
-                        anim: 'idle'
+                        type: 'spawn', id: 'npc', x: 1.1, y: 0.80, w: 46, h: 50, sprite: '../assets/img/characters/benner.png', anims: {
+                            idle: { srcY: 66, frames: 4, fps: 4, frameW: 93, frameH: 158 },
+                            cast: { srcY: 284, frames: 4, fps: 2, frameW: 93, frameH: 154 },
+                        }, flip: true
                     },
                     { type: 'move', id: 'npc', x: 0.80, duration: 1000 },
                 ],
@@ -446,13 +445,13 @@
                 text: "Aveugle ?",
             },
             {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'cast' },
+                ],
                 speaker: 'npc',
                 text: "Obscuris tenebris, caecitas aeterna ! Que les yeux de cet impudent se ferment à jamais !",
             },
             {
-                actions: [
-                    { type: 'anim', id: 'npc', anim: 'cast' },
-                ],
                 speaker: 'npc',
                 text: "COLUMBA CAECITATIS... VENI !!!",
             },
@@ -914,7 +913,7 @@
             overlay.style.display = 'none';
 
             const sfxUnlock = new Audio('../assets/sound/sfx/talking.mp3');
-            sfxUnlock.play().then(() => sfxUnlock.pause()).catch(() => {});
+            sfxUnlock.play().then(() => sfxUnlock.pause()).catch(() => { });
 
             Cinematic.play(canvas, CINE_INTRO, () => {
                 document.getElementById('start-overlay').style.display = 'flex';
