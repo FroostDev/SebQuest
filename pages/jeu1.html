@@ -11,8 +11,7 @@
         body {
             overflow: hidden;
             padding: 0;
-            background-image: url("../assets/img/backgrounds/jeu_1.jpg");
-            background-size: cover;
+            background: #000;
             touch-action: none;
         }
 
@@ -60,6 +59,7 @@
             font-size: 2rem;
             color: var(--yellow);
             text-shadow: 2px 2px 0 #000;
+            text-align: center;
         }
 
         #start-overlay p {
@@ -482,24 +482,214 @@
         // ── Cinématique 2 : TRANSITION ──
         const CINE_TRANSITION = [
             {
-                background: '#0e0e1a',
+                background: '../assets/img/backgrounds/jeu_1.jpg',
+                music: ['../assets/sound/music/discussion.mp3', 0.2],
                 actions: [
-                    { type: 'spawn', id: 'hero', x: 0.5, y: 0.7, w: 88, h: 64, color: '#b4cde8', highlight: '#d8eaf8', outline: '#6a94be', label: 'PIGEON' },
+                    {
+                        type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 0.5, sprite: '../f.jpg', anims: {
+                            idle: { srcY: 0,   frames: 8, fps: 8,  frameW: 127, frameH: 290 },
+                            walk: { srcY: 340, frames: 8, fps: 14, frameW: 127, frameH: 280 },
+                        }, anim: 'idle'
+                    },
+                    {
+                        type: 'spawn', id: 'npc', x: 0.80, y: 0.80, scale: 1, flip: true,
+                        sprite: '../assets/img/characters/benner.png',
+                        anims: {
+                            idle: { srcY: 66,  frames: 4, fps: 4, frameW: 93, frameH: 158 },
+                            cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
+                        }, anim: 'idle'
+                    },
+                    {
+                        type: 'spawn', id: 'pigeon', x: 0.25, y: 0.18, scale: 0.3,
+                        sprite: '../assets/img/characters/pigeon.png',
+                        anims: { idle: { srcY: 0, frames: 4, fps: 8, frameW: 223, frameH: 279 } },
+                        anim: 'idle'
+                    },
                 ],
-                speaker: 'hero',
-                text: "...",
+                speaker: 'lehmann',
+                text: "... C'est chaud. C'est très chaud.",
+            },
+            {
+                speaker: 'npc',
+                text: "HAHAHA ! Comment tu te sens, comédien ?",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Je vois plus rien ! Gustav il a TOUT mis dans les yeux !",
+            },
+            {
+                actions: [
+                    { type: 'move', id: 'pigeon', x: 1.3, duration: 800 },
+                ],
+                speaker: 'npc',
+                text: "Gustav a accompli sa mission. Tu vas errer dans mon parc comme une taupe !",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Y'a pas un robinet quelque part ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Si. Trois fontaines cachées dans le parc. Trouve-les toutes, et tu retrouveras la vue.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Trois ?! Je vois même pas mes pieds là !",
+            },
+            {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'cast' },
+                ],
+                speaker: 'npc',
+                text: "J'ai une dernière attention pour toi... Un radar odorant. Il indique la direction. Le reste, c'est ton problème.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Un radar ? T'es sérieux ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Bonne chance, tu vas en avoir besoin.",
+            },
+            {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'idle' },
+                    { type: 'move', id: 'npc', x: 1.2, duration: 900 },
+                ],
+                speaker: 'lehmann',
+                text: "OK. OK OK. Je vais les trouver ces trois fontaines. Et après j'ai une blague sur les pointeurs C++ qui va lui clouer le bec.",
             },
         ];
 
         // ── Cinématique 3 : FIN ──
         const CINE_END = [
             {
-                background: '#0e0e1a',
+                background: '../assets/img/backgrounds/jeu_1.jpg',
+                music: ['../assets/sound/music/discussion.mp3', 0.2],
                 actions: [
-                    { type: 'spawn', id: 'hero', x: 0.5, y: 0.7, w: 88, h: 64, color: '#b4cde8', highlight: '#d8eaf8', outline: '#6a94be', label: 'PIGEON' },
+                    {
+                        type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 0.5, sprite: '../f.jpg', anims: {
+                            idle: { srcY: 0,   frames: 8, fps: 8,  frameW: 127, frameH: 290 },
+                            walk: { srcY: 340, frames: 8, fps: 14, frameW: 127, frameH: 280 },
+                        }, anim: 'idle'
+                    },
+                    {
+                        type: 'spawn', id: 'npc', x: 1.2, y: 0.80, scale: 1, flip: true,
+                        sprite: '../assets/img/characters/benner.png',
+                        anims: {
+                            idle: { srcY: 66,  frames: 4, fps: 4, frameW: 93, frameH: 158 },
+                            cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
+                        }, anim: 'idle'
+                    },
+                    { type: 'move', id: 'npc', x: 0.78, duration: 1200 },
                 ],
-                speaker: 'hero',
+                speaker: 'lehmann',
+                text: "Mes yeux... je revois ! C'est magnifique. Même toi t'es beau, Benner.",
+            },
+            {
+                speaker: 'npc',
+                text: "Ne pousse pas.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Bon. T'as gagné ce round. Mais c'était quoi tout ça ? Ce parc, Gustav, les fontaines...",
+            },
+            {
+                speaker: 'npc',
+                text: "Ce jardin, je l'ai conçu en 1987. Derrière l'Université Populaire.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "1987 ? T'avais quel âge, douze ans ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Je l'ai créé pour les personnes malvoyantes et aveugles. Pour qu'elles puissent se repérer... par les odeurs.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Par les odeurs ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Cent trente espèces de plantes. Chacune avec son parfum, sa texture. Des sentiers tactiles. Des panneaux en braille.",
+            },
+            {
+                speaker: 'npc',
+                text: "Quelqu'un qui ne voit pas peut traverser ce jardin en entier. Rien qu'en humant l'air et en touchant les feuilles.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "C'est... c'est vraiment beau en fait.",
+            },
+            {
+                speaker: 'npc',
+                text: "Et toi, tu viens de le traverser en aveugle. Sans les plantes. Sans le braille. Juste un radar.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Attends, c'était... un test ? Tu m'as fait vivre ce que vivent les non-voyants ici ?",
+            },
+            {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'cast' },
+                ],
+                speaker: 'npc',
+                text: "Maintenant tu sais pourquoi ce jardin existe. Et pourquoi il mérite qu'on s'en souvienne.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "OK. Chapeau. Vraiment. Mais le coup du pigeon c'était pas obligé.",
+            },
+            {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'idle' },
+                ],
+                speaker: 'npc',
+                text: "Le jardin est orienté plein nord. Les plantes n'ont jamais vraiment bien poussé.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Hein ? C'est quoi ce rapport ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Je dis juste que même les meilleures idées ont leurs défauts. Ce jardin en est la preuve.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Toi tu veux dire que t'es une bonne idée avec un défaut ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Je veux dire que c'est l'intention qui compte. Pas le résultat.",
+            },
+            {
+                speaker: 'lehmann',
                 text: "...",
+            },
+            {
+                speaker: 'lehmann',
+                text: "C'est les anciens fossés de la ville par là, non ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Exact. Le jardin est construit sur l'emplacement des anciens remparts. La ville pousse. L'histoire reste dessous.",
+            },
+            {
+                actions: [
+                    { type: 'move', id: 'npc', x: 1.2, duration: 1000 },
+                ],
+                speaker: 'npc',
+                text: "Prends soin de tes yeux, Lehmann. C'est un luxe que tout le monde n'a pas.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "...",
+            },
+            {
+                speaker: 'lehmann',
+                text: "C'était la meilleure fin de niveau de ma vie.",
             },
         ];
 
@@ -510,6 +700,13 @@
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const pigeonSprite = new Image();
+        pigeonSprite.src = '../assets/img/characters/pigeon.png';
+        const bgImage = new Image();
+        bgImage.src = '../assets/img/backgrounds/jeu_1.jpg';
+        const poopSprite = new Image();
+        poopSprite.src = '../assets/img/poop.png';
+        let pigeonMusic = null;
 
         const PIGEON_W = 44;
         const PIGEON_H = 32;
@@ -622,9 +819,12 @@
         function startGame() {
             if (gameStarted) return;
             gameStarted = true;
+            init();
+            pigeonMusic = new Audio('../assets/sound/music/pigeon.mp3');
+            pigeonMusic.loop = true;
+            pigeonMusic.play().catch(() => {});
             document.getElementById('start-overlay').style.display = 'none';
             document.getElementById('pigeon-pause-btn').style.display = 'flex';
-            init();
         }
 
         /**
@@ -782,6 +982,8 @@
          */
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (bgImage.complete && bgImage.naturalWidth > 0)
+                ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
             const splitY = canvas.height * ZONE_SPLIT;
             if (!gameStarted) return;
 
@@ -795,13 +997,27 @@
             ctx.fill();
             ctx.restore();
 
-            ctx.fillStyle = '#b4cde8';
-            ctx.fillRect(pigeon.x, pigeon.y, PIGEON_W, PIGEON_H);
-            ctx.fillStyle = '#d8eaf8';
-            ctx.fillRect(pigeon.x + 4, pigeon.y + 4, PIGEON_W - 8, 8);
-            ctx.strokeStyle = '#6a94be';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(pigeon.x, pigeon.y, PIGEON_W, PIGEON_H);
+            // ── Pigeon sprite ──
+            const pFrame  = Math.floor(Date.now() / 120) % 4;
+            const pSrcX   = pFrame * 223;
+            const pDispW  = 64, pDispH = 80;
+            const pDrawX  = pigeon.x - (pDispW - PIGEON_W) / 2;
+            const pDrawY  = pigeon.y - (pDispH - PIGEON_H) / 2;
+            ctx.save();
+            ctx.imageSmoothingEnabled = false;
+            if (pigeonSprite.complete && pigeonSprite.naturalWidth > 0) {
+                if (pigeon.vx < 0) {
+                    ctx.translate(pDrawX + pDispW, pDrawY);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(pigeonSprite, pSrcX, 0, 223, 279, 0, 0, pDispW, pDispH);
+                } else {
+                    ctx.drawImage(pigeonSprite, pSrcX, 0, 223, 279, pDrawX, pDrawY, pDispW, pDispH);
+                }
+            } else {
+                ctx.fillStyle = '#b4cde8';
+                ctx.fillRect(pigeon.x, pigeon.y, PIGEON_W, PIGEON_H);
+            }
+            ctx.restore();
 
             ctx.save();
             ctx.setLineDash([4, 6]);
@@ -827,13 +1043,16 @@
             ctx.fillText('NPC', npc.x + NPC_W / 2, npc.y + NPC_H / 2);
 
             for (const p of poops) {
-                ctx.fillStyle = '#7b4220';
-                ctx.fillRect(p.x, p.y, POOP_W, POOP_H);
-                ctx.fillStyle = '#a05c30';
-                ctx.fillRect(p.x + 2, p.y + 2, POOP_W - 6, 5);
-                ctx.strokeStyle = '#3d1a08';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(p.x, p.y, POOP_W, POOP_H);
+                ctx.save();
+                ctx.imageSmoothingEnabled = false;
+                if (poopSprite.complete && poopSprite.naturalWidth > 0) {
+                    const pDispW = 32, pDispH = 32;
+                    ctx.drawImage(poopSprite, p.x - (pDispW - POOP_W) / 2, p.y - (pDispH - POOP_H) / 2, pDispW, pDispH);
+                } else {
+                    ctx.fillStyle = '#7b4220';
+                    ctx.fillRect(p.x, p.y, POOP_W, POOP_H);
+                }
+                ctx.restore();
             }
 
             if (gameOver) {
@@ -1075,7 +1294,7 @@
         function scheduleBeep() {
             if (!radarPhase || radarGameOver || radarWin) return;
             const dist = lastBeepDist;
-            const freq = dist < 50 ? 1100 : dist < 100 ? 990 : 880;
+            const freq = dist < 10 ? 1100 : dist < 20 ? 990 : 880;
             playBeep(freq);
             beepTimeout = setTimeout(scheduleBeep, beepInterval(dist));
         }
@@ -1100,11 +1319,12 @@
          */
         function startRadarPhase() {
             gameStarted = false;
+            if (pigeonMusic) { pigeonMusic.pause(); pigeonMusic = null; }
             document.getElementById('pigeon-pause-btn').style.display = 'none';
             Cinematic.play(canvas, CINE_TRANSITION, () => {
                 // Afficher le menu avant de lancer le radar
                 const overlay = document.getElementById('start-overlay');
-                overlay.querySelector('h1').textContent = 'RADAR GPS';
+                overlay.querySelector('h1').textContent = 'RADAR ODORANT';
                 document.getElementById('controls-hint').innerHTML = isMobile
                     ? 'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.'
                     : 'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.';
@@ -1187,6 +1407,7 @@
                 playCollectSound();
                 radarCollected++;
                 radarFlash = 50;
+                radarTimerStart = Date.now() - (RADAR_TIMER - 60000);
 
                 const hpFill = document.getElementById('hp-fill');
                 if (hpFill) hpFill.setAttribute('width', ((radarCollected / TOTAL_TARGETS) * HP_BAR_MAX_W).toFixed(1));
