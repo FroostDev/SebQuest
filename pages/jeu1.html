@@ -457,9 +457,14 @@
             },
             {
                 actions: [
-                    { type: 'spawn', id: 'pigeon', x: 0.20, y: 0.0, w: 40, h: 40, color: '#aaaaaa', highlight: '#cccccc', outline: '#777777', label: '🐦' },
+                    { type: 'spawn', id: 'pigeon', x: 0.20, y: 0.0, scale: 0.3,
+                        sprite: '../assets/img/characters/pigeon.png',
+                        anims: {
+                            idle: { srcY: 0, frames: 4, fps: 8, frameW: 223, frameH: 279 },
+                        },
+                        anim: 'idle'
+                    },
                     { type: 'move', id: 'pigeon', y: 0.3, duration: 800 },
-                    { type: 'anim', id: 'npc', anim: 'idle' },
                 ],
                 speaker: 'lehmann',
                 text: "... Un pigeon ?",
