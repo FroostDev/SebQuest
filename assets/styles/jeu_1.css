@@ -1,10 +1,258 @@
 body {
-    background-image: url("../img/backgrounds/jeu_1.jpg");
-    background-size: 100%;
-    padding: 16px;
+    overflow: hidden;
+    padding: 0;
+    background: #000;
+    touch-action: none;
+}
+
+canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+#radarCanvas {
+    display: none;
+    z-index: 1;
 }
 
 .status_bar {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
     max-width: 90%;
     height: auto;
+}
+
+#start-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-family: "Retro", monospace;
+    gap: 16px;
+}
+
+#controls-hint {
+    font-family: "RetroTalk";
+}
+
+#start-overlay h1 {
+    font-size: 2rem;
+    color: var(--yellow);
+    text-shadow: 2px 2px 0 #000;
+    text-align: center;
+}
+
+#start-overlay p {
+    font-size: 1rem;
+    text-align: center;
+    max-width: 280px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 0 #000;
+}
+
+#start-btn {
+    margin-top: 8px;
+    padding: 12px 32px;
+    font-size: 1.2rem;
+    font-family: "Retro", monospace;
+    cursor: pointer;
+    background: var(--yellow);
+    border: none;
+    border-right: var(--lightyellow) 4px solid;
+    border-top: var(--lightyellow) 4px solid;
+    border-left: var(--darkyellow) 4px solid;
+    border-bottom: var(--darkyellow) 4px solid;
+    color: var(--white);
+}
+
+#pigeon-pause-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 60;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    width: 32px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+#pigeon-pause-btn span {
+    display: block;
+    height: 4px;
+    background: var(--yellow);
+    outline: 2px var(--white) solid;
+    position: relative;
+    overflow: hidden;
+}
+
+#pigeon-pause-btn span::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    background: var(--lightyellow);
+    width: 100%;
+    height: 100%;
+}
+
+#pigeon-pause-menu {
+    position: fixed;
+    inset: 0;
+    transform: translateX(100%);
+    background: var(--yellow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform .4s ease-in-out;
+    z-index: 50;
+}
+
+#pigeon-pause-menu.open {
+    transform: translateX(0);
+}
+
+#pigeon-pause-menu ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+}
+
+#pigeon-pause-menu li {
+    font-size: 28px;
+    font-family: "Retro", monospace;
+}
+
+#pigeon-pause-menu li button {
+    font-size: 28px;
+    font-family: "Retro", monospace;
+    color: var(--white);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+#pigeon-pause-menu li button::before {
+    content: '';
+    position: absolute;
+    height: 2px;
+    background: var(--darkyellow);
+    width: 110%;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    top: calc(100% + 4px);
+    transition: transform .4s ease-in-out;
+}
+
+#pigeon-pause-menu li button:hover::before {
+    transform: translateX(-50%) scaleX(1);
+}
+
+#radar-pause-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 60;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    width: 32px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+#radar-pause-btn span {
+    display: block;
+    height: 4px;
+    background: var(--yellow);
+    outline: 2px var(--white) solid;
+    position: relative;
+    overflow: hidden;
+}
+
+#radar-pause-btn span::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    background: var(--lightyellow);
+    width: 100%;
+    height: 100%;
+}
+
+#radar-pause-menu {
+    position: fixed;
+    inset: 0;
+    transform: translateX(100%);
+    background: var(--yellow);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform .4s ease-in-out;
+    z-index: 50;
+}
+
+#radar-pause-menu.open {
+    transform: translateX(0);
+}
+
+#radar-pause-menu ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+}
+
+#radar-pause-menu li {
+    font-size: 28px;
+    font-family: "Retro", monospace;
+}
+
+#radar-pause-menu li button {
+    font-size: 28px;
+    font-family: "Retro", monospace;
+    color: var(--white);
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+#radar-pause-menu li button::before {
+    content: '';
+    position: absolute;
+    height: 2px;
+    background: var(--darkyellow);
+    width: 110%;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    top: calc(100% + 4px);
+    transition: transform .4s ease-in-out;
+}
+
+#radar-pause-menu li button:hover::before {
+    transform: translateX(-50%) scaleX(1);
 }
