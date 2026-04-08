@@ -384,6 +384,7 @@
         const CINE_INTRO = [
             {
                 background: '../assets/img/backgrounds/jeu_1.jpg',
+                music: ['../assets/sound/music/discussion.mp3', 0.2],
                 actions: [
                     {
                         type: 'spawn', id: 'lehmann', x: -0.1, y: 0.88, scale: 0.5, sprite: '../f.jpg', anims: {
@@ -393,32 +394,40 @@
                         },
                         anim: 'idle'
                     },
-                    { type: 'anim', id: 'lehmann', anim:'walk' },
+                    { type: 'anim', id: 'lehmann', anim: 'walk' },
                     { type: 'move', id: 'lehmann', x: 0.20, duration: 1500 },
-                    { type: 'anim', id: 'lehmann', anim:'idle' },
+                    { type: 'anim', id: 'lehmann', anim: 'idle' },
                 ],
                 speaker: 'lehmann',
                 text: "Mais il est super ce parc !",
             },
             {
                 actions: [
-                    { type: 'spawn', id: 'npc', x: 1.1, y: 0.88, w: 46, h: 50, color: '#e8863a', highlight: '#f0a060', outline: '#b05818', label: 'NPC' },
+                    {
+                        type: 'spawn', id: 'npc', x: 1.1, y: 0.88, scale: 1, flip: true,
+                        sprite: '../assets/img/characters/benner.png',
+                        anims: {
+                            idle: { srcY: 66,  frames: 4, fps: 4, frameW: 93, frameH: 158 },
+                            cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
+                        },
+                        anim: 'idle'
+                    },
                     { type: 'move', id: 'npc', x: 0.80, duration: 1000 },
                 ],
                 speaker: 'npc',
-                text: "JE SUIS LE DOCTEUR BENNER ! LE MAITRE DE CES LIEUX ! J'AI DEVELO...",
+                text: "JE SUIS LE ROLF BENNER ! LE MAÎTRE DE CES LIEUX ! J'AI DEVELO...",
             },
             {
                 speaker: 'lehmann',
-                text: "ATTEND ! Tu as bien dis developper ? Oh ! J'en ai une !",
+                text: "ATTENDS ! Tu as bien dit développer ? Oh ! J'en ai une !",
             },
             {
                 speaker: 'lehmann',
-                text: "Que dis un dev qui a oublie de definir sa liste en HTML ?",
+                text: "Que dit un dev qui a oublié de définir sa liste en HTML ?",
             },
             {
                 speaker: 'npc',
-                text: "Qu'est ce que tu me raconte la ?",
+                text: "Qu'est-ce que tu me racontes là ?",
             },
             {
                 speaker: 'lehmann',
@@ -426,7 +435,7 @@
             },
             {
                 speaker: 'npc',
-                text: "Tu te fou de moi ? En racontant ce genre de blagues sans aucuns goûts dans mon parc, tu manque de respect au personnes pour qui j'ai crée ce parc !",
+                text: "Tu te fous de moi ? En racontant ce genre de blagues sans aucun goût dans mon parc, tu manques de respect aux personnes pour qui j'ai créé ce parc !",
             },
             {
                 speaker: 'npc',
@@ -435,6 +444,39 @@
             {
                 speaker: 'lehmann',
                 text: "Aveugle ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Obscuris tenebris, caecitas aeterna ! Que les yeux de cet impudent se ferment à jamais !",
+            },
+            {
+                actions: [
+                    { type: 'anim', id: 'npc', anim: 'cast' },
+                ],
+                speaker: 'npc',
+                text: "COLUMBA CAECITATIS... VENI !!!",
+            },
+            {
+                actions: [
+                    { type: 'spawn', id: 'pigeon', x: 0.20, y: 0.0, scale: 0.3,
+                        sprite: '../assets/img/characters/pigeon.png',
+                        anims: {
+                            idle: { srcY: 0, frames: 4, fps: 8, frameW: 223, frameH: 279 },
+                        },
+                        anim: 'idle'
+                    },
+                    { type: 'move', id: 'pigeon', y: 0.3, duration: 800 },
+                ],
+                speaker: 'lehmann',
+                text: "... Un pigeon ?",
+            },
+            {
+                speaker: 'npc',
+                text: "Pas n'importe lequel. C'est GUSTAV !",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Hein ? Mais qu'est-ce qu'il fout ce pigeon au-dessus de m... AAAH NON NON NON !",
             },
         ];
 
