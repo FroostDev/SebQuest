@@ -529,7 +529,6 @@ window.addEventListener('keyup', e => { keys[e.key] = false; });
 function updateHPBar() {
     const fill = document.getElementById('hp-fill');
     if (fill) fill.setAttribute('width', Math.max(0, (hp / 100) * HP_BAR_MAX_W).toFixed(1));
-    window.navigator.vibrate([200, 100]);
 }
 
 /**
