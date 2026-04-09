@@ -21,6 +21,19 @@ function open_menu() {
 start_main_menu.addEventListener("click", launch_start_menu);
 hamburger_btn.addEventListener("click", open_menu);
 
+// Lancement normal → pas de dev mode
+document.querySelector('.start_game_btn').addEventListener('click', () => {
+    localStorage.setItem('devMode', 'false');
+});
+
+// Lancement depuis le menu hamburger → dev mode
+document.querySelectorAll('#nav a[href]').forEach(link => {
+    if (!link.getAttribute('href')) return;
+    link.addEventListener('click', () => {
+        localStorage.setItem('devMode', 'true');
+    });
+});
+
 const resetBtn = document.getElementById('reset-btn');
 const resetOverlay = document.getElementById('reset-confirm-overlay');
 const resetYes = document.getElementById('reset-confirm-yes');
@@ -37,5 +50,4 @@ resetNo.addEventListener('click', () => {
 resetYes.addEventListener('click', () => {
     localStorage.removeItem('sebquest_level');
     resetOverlay.classList.remove('open');
-    window.location.href = 'pages/carte.html';
 });

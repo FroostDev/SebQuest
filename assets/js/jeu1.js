@@ -1338,11 +1338,16 @@ function handleRadarTap() {
         document.getElementById('radar-skip-target-btn').style.display = 'none';
         document.getElementById('radar-pause-menu').classList.remove('open');
 
-        // Jouer la cinématique de fin, puis passer au niveau suivant
+        // Jouer la cinématique de fin, puis passer au niveau suivant (ou retour menu en dev mode)
         Cinematic.play(canvas, CINE_END, () => {
-            const currentLevel = parseInt(localStorage.getItem('sebquest_level') || '0', 10);
-            localStorage.setItem('sebquest_level', currentLevel + 1);
-            window.location.href = '../pages/carte.html';
+            if (localStorage.getItem('devMode') === 'true') {
+                localStorage.setItem('devMode', 'false');
+                window.location.href = '../index.html';
+            } else {
+                const currentLevel = parseInt(localStorage.getItem('sebquest_level') || '0', 10);
+                localStorage.setItem('sebquest_level', currentLevel + 1);
+                window.location.href = '../pages/carte.html';
+            }
         });
         return;
     }

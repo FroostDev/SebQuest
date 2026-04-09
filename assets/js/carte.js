@@ -186,19 +186,11 @@ function onPosition(pos, level) {
         });
         userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
 
-        routeControl = L.polyline([[lat, lng], [dest.lat, dest.lng]], {
-            color: '#FFAA2A',
-            weight: 4,
-            dashArray: '12, 8',
-            opacity: 0.85,
-        }).addTo(map);
-
         map.fitBounds([[lat, lng], [dest.lat, dest.lng]], { padding: [60, 60] });
+        fetchRoute(lat, lng, dest);
     } else {
         userMarker.setLatLng([lat, lng]);
-        if (routeControl) {
-            routeControl.setLatLngs([[lat, lng], [dest.lat, dest.lng]]);
-        }
+        fetchRoute(lat, lng, dest);
     }
 
     const dist = haversine(lat, lng, dest.lat, dest.lng);
@@ -232,6 +224,36 @@ function showFinished() {
     document.getElementById('arrival-title').textContent = 'Aventure terminée !';
     document.getElementById('arrival-sub').textContent = 'Tu as complété toutes les étapes. Bravo !';
     overlay.style.display = 'flex';
+}
+
+// =========
+//  ROUTING PIÉTON
+// =========
+function fetchRoute(lat, lng, dest) {
+    const url = `https://router.project-osrm.org/route/v1/foot/${lng},${lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson`;
+
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.routes || data.routes.length === 0) return;
+            const coords = data.routes[0].geometry.coordinates.map(([lo, la]) => [la, lo]);
+            if (routeControl) map.removeLayer(routeControl);
+            routeControl = L.polyline(coords, {
+                color: '#FFAA2A',
+                weight: 4,
+                opacity: 0.85,
+            }).addTo(map);
+        })
+        .catch(() => {
+            // Fallback ligne droite si OSRM indisponible
+            if (routeControl) map.removeLayer(routeControl);
+            routeControl = L.polyline([[lat, lng], [dest.lat, dest.lng]], {
+                color: '#FFAA2A',
+                weight: 4,
+                dashArray: '12, 8',
+                opacity: 0.85,
+            }).addTo(map);
+        });
 }
 
 // =========
