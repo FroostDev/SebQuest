@@ -25,11 +25,25 @@ const BRIEFING_TEXTS = [
             "Alright. Let's go. Slowly.",
         ],
     },
-    // Niveau 1 — placeholder
+    // Niveau 1 — intro jeu2
     {
-        fr: [ "Excellent travail ! L'aventure continue...", "Prochaine destination." ],
-        en: [ "Excellent work! The adventure continues...", "Next destination." ],
+        fr: [
+            "Sérieusement, ce pigeon... C'est quoi son problème ? Il a confondu mon épaule avec une zone de déploiement ?",
+            "Ma chemise est complètement bugée. Je peux pas rester comme ça. Il me faut une nouvelle tenue, et vite.",
+            "Halte, jeune impudent ! Tu oses fouler le sol de Mulhouse dans de tels haillons ?",
+            "Rendez-vous Place de la Concorde. Là, tu trouveras de quoi 'compiler' une tenue digne d'un Mulhousien du XVIIIe siècle.",
+            "OK, le fantôme est un peu vieux jeu, mais il a raison. Direction la rivière ! On va crafter un patch textile.",
+        ],
+        en: [
+            "Seriously, that pigeon... What's its problem? Did it mistake my shoulder for a deployment zone?",
+            "My shirt's CSS is completely broken. I can't stay like this. I need a new outfit, and I need it fast.",
+            "Halt, you impudent youth! You dare tread upon Mulhouse soil in such rags?",
+            "Head to the Place de la Concorde. There, you shall find enough to 'compile' a suit worthy of an 18th-century Mulhousien.",
+            "Okay, the ghost is a bit old-school, but he's right. To the river! Time to craft a little textile patch.",
+        ],
     },
+    // Niveau 2 — pas de cinématique (transition assurée par la fin de jeu2)
+    { fr: [], en: [] },
 ];
 
 // =======
@@ -45,12 +59,12 @@ const LEVELS = [
         game: 'jeu1.html',
         briefing: [
             {
-                background: '../assets/img/backgrounds/intro.jpg',
+                background: '../assets/img/menu/intro.jpg',
                 music: ['../assets/sound/music/discussion.mp3', 0.2],
                 actions: [
                     {
                         type: 'spawn', id: 'lehmann', x: -0.1, y: 0.84, scale: 3,
-                        sprite: '../assets/img/characters/lehmann.svg',
+                        sprite: '../assets/img/jeu1/lehmann.svg',
                         anims: {
                             idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
                             walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 }
@@ -90,7 +104,7 @@ const LEVELS = [
             {
                 actions: [
                     { type: 'anim', id: 'lehmann', anim: 'walk' },
-                    { type: 'flip', id: 'lehmann' },
+                    // { type: 'flip', id: 'lehmann' },
                     { type: 'move', id: 'lehmann', x: 1.2, duration: 1200 },
                 ],
                 text: "",
@@ -99,48 +113,73 @@ const LEVELS = [
     },
     {
         destination: {
-            lat: 48.5850,
-            lng: 7.7480,
+            lat: 47.729522781882245,
+            lng: 7.301288857836423,
             name: "Prochaine Destination",
         },
         game: 'jeu2.html',
         briefing: [
             {
-                background: '../assets/img/backgrounds/intro.jpg',
-                music: ['../assets/sound/music/discussion.mp3', 0.2],
+                background: '../assets/img/jeu2/background-mobile.png',
+                music: ['../assets/sound/music/discussion.mp3', 0.5],
                 actions: [
                     {
-                        type: 'spawn', id: 'lehmann', x: -0.1, y: 0.84, scale: 3,
-                        sprite: '../assets/img/characters/lehmann.svg',
-                        anims: {
-                            idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
-                            walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 },
-                        },
-                        anim: 'walk'
+                        type: 'spawn', id: 'seb', x: 0.2, y: 0.8,
+                        sprite: '../assets/img/jeu2/lehmann.png',
+                        anims: { idle: { srcY: 0, frameW: 24, frameH: 52, frames: 8, fps: 10 } },
+                        scale: 3
                     },
-                    { type: 'move', id: 'lehmann', x: 0.22, duration: 1400 },
-                    { type: 'anim', id: 'lehmann', anim: 'idle' },
+                    { type: 'wait', duration: 500 },
                 ],
-                speaker: 'lehmann',
-                text: "Excellent travail ! L'aventure continue...",
+                speaker: 'seb',
+                text: "Seriously, that pigeon...",
             },
             {
-                speaker: 'lehmann',
-                text: "Direction la prochaine étape. Suis la carte !",
+                speaker: 'seb',
+                text: "My shirt's CSS is completely broken.",
             },
             {
                 actions: [
-                    { type: 'anim', id: 'lehmann', anim: 'walk' },
-                    { type: 'flip', id: 'lehmann' },
-                    { type: 'move', id: 'lehmann', x: 1.2, duration: 1000 },
+                    {
+                        type: 'spawn', id: 'dollfus', x: 0.8, y: 0.8,
+                        sprite: '../assets/img/jeu2/dollfus.png',
+                        anims: { idle: { srcY: 0, frameW: 109, frameH: 191, cols: 4, frames: 4, fps: 8 } },
+                        scale: 0.7, flip: true
+                    },
+                    { type: 'wait', duration: 800 },
+                    { type: 'flip', id: 'seb', flip: true },
                 ],
-                text: "",
+                speaker: 'dollfus',
+                text: "Halt, you impudent youth!",
+            },
+            {
+                speaker: 'dollfus',
+                text: "Head to the Place de la Concorde.",
+            },
+            {
+                actions: [
+                    { type: 'remove', id: 'dollfus' },
+                    { type: 'flip', id: 'seb', flip: false },
+                ],
+                speaker: 'seb',
+                text: "Okay, the ghost is a bit old-school.",
             },
         ],
     },
+    {
+        destination: {
+            lat: 47.7508,
+            lng: 7.3359,
+            name: "Mulhouse",
+            isZone: true,
+            radius: 5000,
+        },
+        game: 'jeu3.html',
+        briefing: [],
+    },
 ];
 
-const ARRIVAL_RADIUS = 30; 
+const ARRIVAL_RADIUS = 300; 
 
 // ==========
 //  PROGRESSION
@@ -174,12 +213,18 @@ window.addEventListener('load', () => {
 
     document.getElementById('map-destination-name').textContent = currentLevel.destination.name;
 
-    Cinematic.play(canvas, applyCineTexts(currentLevel.briefing, BRIEFING_TEXTS[level][getLang()]), () => {
+    const showMap = () => {
         canvas.style.display = 'none';
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('carte-pause-btn').style.display = 'flex';
         initMap(currentLevel);
-    });
+    };
+
+    if (currentLevel.briefing.length === 0) {
+        showMap();
+    } else {
+        Cinematic.play(canvas, applyCineTexts(currentLevel.briefing, BRIEFING_TEXTS[level][getLang()]), showMap);
+    }
 });
 
 // =====
@@ -199,16 +244,26 @@ function initMap(level) {
         { maxZoom: 19 }
     ).addTo(map);
 
-    const destIcon = L.divIcon({
-        className: '',
-        html: '<div class="dest-marker">🎯</div>',
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-    });
-    L.marker([dest.lat, dest.lng], { icon: destIcon })
-     .addTo(map)
-     .bindPopup(`<b>${dest.name}</b>`)
-     .openPopup();
+    if (dest.isZone) {
+        L.circle([dest.lat, dest.lng], {
+            radius: dest.radius,
+            color: '#FFAA2A',
+            fillColor: '#FFAA2A',
+            fillOpacity: 0.1,
+            weight: 2,
+        }).addTo(map);
+    } else {
+        const destIcon = L.divIcon({
+            className: '',
+            html: '<div class="dest-marker">🎯</div>',
+            iconSize: [36, 36],
+            iconAnchor: [18, 36],
+        });
+        L.marker([dest.lat, dest.lng], { icon: destIcon })
+         .addTo(map)
+         .bindPopup(`<b>${dest.name}</b>`)
+         .openPopup();
+    }
 
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(
@@ -236,20 +291,37 @@ function onPosition(pos, level) {
         });
         userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
 
-        map.fitBounds([[lat, lng], [dest.lat, dest.lng]], { padding: [60, 60] });
-        fetchRoute(lat, lng, dest);
+        if (dest.isZone) {
+            map.setView([lat, lng], 13);
+        } else {
+            map.fitBounds([[lat, lng], [dest.lat, dest.lng]], { padding: [60, 60] });
+            fetchRoute(lat, lng, dest);
+        }
     } else {
         userMarker.setLatLng([lat, lng]);
-        fetchRoute(lat, lng, dest);
+        if (!dest.isZone) fetchRoute(lat, lng, dest);
     }
 
     const dist = haversine(lat, lng, dest.lat, dest.lng);
-    const distStr = dist < 1000
-        ? `${Math.round(dist)} m`
-        : `${(dist / 1000).toFixed(2)} km`;
-    document.getElementById('map-distance').textContent = t('carte.dist', { d: distStr });
+    const arrivalRadius = dest.radius || ARRIVAL_RADIUS;
 
-    if (dist <= ARRIVAL_RADIUS) {
+    if (dest.isZone) {
+        if (dist <= arrivalRadius) {
+            document.getElementById('map-distance').textContent = t('carte.in-zone');
+        } else {
+            const distStr = dist < 1000
+                ? `${Math.round(dist)} m`
+                : `${(dist / 1000).toFixed(2)} km`;
+            document.getElementById('map-distance').textContent = t('carte.dist', { d: distStr });
+        }
+    } else {
+        const distStr = dist < 1000
+            ? `${Math.round(dist)} m`
+            : `${(dist / 1000).toFixed(2)} km`;
+        document.getElementById('map-distance').textContent = t('carte.dist', { d: distStr });
+    }
+
+    if (dist <= arrivalRadius) {
         triggerArrival(level);
     }
 }

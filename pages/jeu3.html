@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Lehmann Jump</title>
+    <link rel="stylesheet" href="../assets/styles/jeu3.css">
+</head>
+
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <button id="pauseBtn" class="top-btn">⏸</button>
+    <button id="soundBtn" class="top-btn">🔊</button>
+
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div class="score-display">
+                <div id="scoreEl">0m</div>
+                <div class="money-display" style="margin-top: 5px;"><span class="coin-icon"></span><span id="moneyEl">0</span></div>
+                <div id="comboEl" class="combo-text hidden">COMBO x2 !</div>
+            </div>
+        </div>
+
+        <div id="menuScreen" class="screen">
+            <div class="title">LEHMANN<br>JUMP</div>
+            <button class="button" id="startBtn" data-i18n="btn_play">JOUER</button>
+            <button class="button" id="shopBtn" style="background: linear-gradient(180deg, #ffca28, #ff8f00); color: #000; text-shadow: none; border-color: #ff6f00;" data-i18n="btn_shop">BOUTIQUE</button>
+            <button class="button" id="settingsBtn" data-i18n="btn_settings">PARAMETRES</button>
+            <div class="instructions" id="menuInstructions">
+                INCLINEZ LE TELEPHONE OU TOUCHEZ LES BORDS POUR BOUGER.<br><br>EVITEZ LES PIQUES ROUGES.<br><br>RECOLTEZ LES PIECES POUR DES COMBOS !
+            </div>
+            <div class="stats" id="highScoreMenu">MEILLEUR SCORE : 0M</div>
+        </div>
+
+        <div id="settingsScreen" class="screen hidden">
+            <div class="title params-title" id="settingsTitle">PARAMETRES</div>
+            <div class="stat-row">
+                <label class="gyro-label">
+                    <input type="checkbox" id="gyroToggle">
+                    <span id="gyroLabelText">ACTIVER GYROSCOPE</span>
+                </label>
+            </div>
+            <div class="instructions instructions-settings" id="gyroInstructions">
+                (DESACTIVER POUR JOUER UNIQUEMENT EN TOUCHANT L'ECRAN)
+            </div>
+
+            <div class="lifetime-stats">
+                <div class="lifetime-stats-title" id="statsTitle">STATISTIQUES GLOBALES</div>
+                <div class="stats-grid">
+                    <div><span id="labelGames">PARTIES JOUEES</span> : <span id="statGames" class="highlight">0</span></div>
+                    <div><span id="labelAlt">ALTITUDE TOTALE</span> : <span id="statAlt" class="highlight">0</span>m</div>
+                    <div><span id="labelCoins">PIECES RECOLTEES</span> : <span id="statCoins" class="highlight">0</span></div>
+                </div>
+            </div>
+
+            <div class="stat-row" style="margin-top: 15px;">
+                <label class="gyro-label">
+                    <input type="checkbox" id="cinematicsToggle">
+                    <span id="cinematicsLabelText">ACTIVER CINEMATIQUES</span>
+                </label>
+            </div>
+
+            <button class="button" id="langToggleBtn" style="background-color: #1565c0; border-bottom: 4px solid #0d47a1; margin-bottom: 10px;">🇬🇧 ENGLISH</button>
+            <button class="button" id="closeSettingsBtn" data-i18n="btn_back">RETOUR</button>
+        </div>
+
+        <div id="shopScreen" class="screen hidden">
+            <div class="title params-title" id="shopTitle" style="color: #ffca28;">BOUTIQUE</div>
+            <div class="stat-row" style="margin-bottom: 20px;">
+                <span id="shopCoinsLabel">VOS PIECES</span> : <span id="shopCoins" class="highlight" style="color: #ffeb3b;">0</span>
+            </div>
+
+            <div class="instructions instructions-settings" style="text-align: left; margin: 10px 20px;">
+                <h3 id="magnetName" style="color: #9c27b0; margin:0 0 5px 0;">AIMANT x2</h3>
+                <p id="magnetDesc" style="margin:0 0 10px 0; font-size:12px;">Attire les pièces plus longtemps (+2s par Niv).</p>
+                <button class="button" id="buyMagnetBtn" style="font-size:14px; padding: 10px;">ACHETER</button>
+            </div>
+
+            <div class="instructions instructions-settings" style="text-align: left; margin: 10px 20px;">
+                <h3 id="rocketName" style="color: #ff5722; margin:0 0 5px 0;">FUSEE BOOSTER</h3>
+                <p id="rocketDesc" style="margin:0 0 10px 0; font-size:12px;">Prolonge la durée de vol (+1.5s par Niv).</p>
+                <button class="button" id="buyRocketBtn" style="font-size:14px; padding: 10px;">ACHETER</button>
+            </div>
+
+            <div class="instructions instructions-settings" style="text-align: left; margin: 10px 20px;">
+                <h3 id="fortuneName" style="color: #4caf50; margin:0 0 5px 0;">FORTUNE</h3>
+                <p id="fortuneDesc" style="margin:0 0 10px 0; font-size:12px;">Augmente la valeur des pièces récoltées (+1 par Niv).</p>
+                <button class="button" id="buyCoinValueBtn" style="font-size:14px; padding: 10px;">ACHETER</button>
+            </div>
+
+            <button class="button" id="closeShopBtn" style="margin-top: 20px;" data-i18n="btn_back">RETOUR</button>
+        </div>
+
+        <div id="pauseScreen" class="screen hidden">
+            <div class="title pause-title" data-i18n="pause_title">PAUSE</div>
+            <button class="button" id="resumeBtn" data-i18n="btn_resume">REPRENDRE</button>
+            <div style="margin-top: 30px; font-size: 10px; color: #fff; text-shadow: none;">-- DEBUG CINÉMATIQUES --</div>
+            <button class="button" id="devBtn300" style="font-size: 12px; padding: 10px; margin-top: 10px; background-color: #546e7a; box-shadow: inset 0 -4px 0 #37474f;">ALLER À 300m (Textile)</button>
+            <button class="button" id="devBtn3000" style="font-size: 12px; padding: 10px; margin-top: 10px; background-color: #546e7a; box-shadow: inset 0 -4px 0 #37474f;">ALLER À 3000m (Industrie)</button>
+            <button class="button" id="devBtn10000" style="font-size: 12px; padding: 10px; margin-top: 10px; background-color: #546e7a; box-shadow: inset 0 -4px 0 #37474f;">ALLER À 10000m (Science)</button>
+        </div>
+
+        <div id="countdownScreen" class="screen hidden">
+            <div id="resumeCountdown" class="countdown-text">3</div>
+        </div>
+
+        <div id="victoryScreen" class="screen hidden">
+            <div class="title" id="victoryTitle" style="color: #ffd700; text-shadow: 0 4px 0 #b8860b;">VICTOIRE !</div>
+            <div class="instructions" id="victoryText" style="margin-bottom: 30px;">
+                INCROYABLE !<br><br>VOUS AVEZ ATTEINT 1500 METRES.
+            </div>
+            <button class="button" id="victoryFinishBtn" data-i18n="btn_finish">TERMINER</button>
+            <button class="button" id="victoryContinueBtn" style="font-size: 0.8rem; margin-top: 15px;" data-i18n="btn_continue">CONTINUER A L'INFINI</button>
+        </div>
+
+        <div id="gameOverScreen" class="screen hidden">
+            <div class="game-over-title" id="gameOverTitle">PARTIE TERMINEE</div>
+            <div class="stat-row"><span id="labelAltitude">ALTITUDE</span> : <span id="finalScore" class="highlight">0</span>m</div>
+            <div class="stat-row final-stat-row"><span id="labelFinalCoins">PIECES</span> : <span id="finalCoins" class="highlight">0</span>
+            </div>
+            <button class="button" id="restartBtn" style="margin-bottom: 15px;" data-i18n="btn_retry">REESSAYER</button>
+            <button class="button" id="menuReturnBtn" style="background-color: #546e7a; text-shadow: none; border-bottom: 4px solid #37474f;" data-i18n="btn_menu">RETOUR AU MENU</button>
+        </div>
+    </div>
+
+    <script src="../assets/js/lang.js"></script>
+    <script src="../assets/js/cinematic.js"></script>
+    <script src="../assets/js/jeu3.js"></script>
+</body>
+
+</html>

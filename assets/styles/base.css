@@ -42,6 +42,7 @@ a {
     cursor: pointer;
     color: var(--white);
     font-family: "Retro";
+    text-align: center;
 }
 
 header {

@@ -120,11 +120,11 @@ const CINE_TEXTS = {
 // Cinématique 1 : INTRO
 const CINE_INTRO = [
     {
-        background: '../assets/img/backgrounds/jeu_1.jpg',
+        background: '../assets/img/jeu1/jeu_1.jpg',
         music: ['../assets/sound/music/discussion.mp3', 0.2],
         actions: [
             {
-                type: 'spawn', id: 'lehmann', x: -0.1, y: 0.84, scale: 3, sprite: '../assets/img/characters/lehmann.svg', anims: {
+                type: 'spawn', id: 'lehmann', x: -0.1, y: 0.84, scale: 3, sprite: '../assets/img/jeu1/lehmann.svg', anims: {
                     idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
                     walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 },
                     jump: { srcY: 97, frames: 4, fps: 12, frameW: 24, frameH: 47 },
@@ -141,7 +141,7 @@ const CINE_INTRO = [
     {
         actions: [
             {
-                type: 'spawn', id: 'npc', x: 1.1, y: 0.80, w: 46, h: 50, sprite: '../assets/img/characters/benner.png', anims: {
+                type: 'spawn', id: 'npc', x: 1.1, y: 0.80, w: 46, h: 50, sprite: '../assets/img/jeu1/benner.png', anims: {
                     idle: { srcY: 66, frames: 4, fps: 4, frameW: 93, frameH: 158 },
                     cast: { srcY: 284, frames: 4, fps: 2, frameW: 93, frameH: 154 },
                 }, flip: true
@@ -194,7 +194,7 @@ const CINE_INTRO = [
         actions: [
             {
                 type: 'spawn', id: 'pigeon', x: 0.20, y: 0.0, scale: 0.3,
-                sprite: '../assets/img/characters/pigeon.png',
+                sprite: '../assets/img/jeu1/pigeon.png',
                 anims: {
                     idle: { srcY: 0, frames: 4, fps: 8, frameW: 223, frameH: 279 },
                 },
@@ -218,18 +218,18 @@ const CINE_INTRO = [
 // Cinématique 2 : TRANSITION
 const CINE_TRANSITION = [
     {
-        background: '../assets/img/backgrounds/jeu_1.jpg',
+        background: '../assets/img/jeu1/jeu_1.jpg',
         music: ['../assets/sound/music/discussion.mp3', 0.2],
         actions: [
             {
-                type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 3, sprite: '../assets/img/characters/lehmann.svg', anims: {
+                type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 3, sprite: '../assets/img/jeu1/lehmann.svg', anims: {
                     idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
                     walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 },
                 }, anim: 'idle'
             },
             {
                 type: 'spawn', id: 'npc', x: 0.80, y: 0.80, scale: 1, flip: true,
-                sprite: '../assets/img/characters/benner.png',
+                sprite: '../assets/img/jeu1/benner.png',
                 anims: {
                     idle: { srcY: 66, frames: 4, fps: 4, frameW: 93, frameH: 158 },
                     cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
@@ -237,7 +237,7 @@ const CINE_TRANSITION = [
             },
             {
                 type: 'spawn', id: 'pigeon', x: 0.25, y: 0.18, scale: 0.3,
-                sprite: '../assets/img/characters/pigeon.png',
+                sprite: '../assets/img/jeu1/pigeon.png',
                 anims: { idle: { srcY: 0, frames: 4, fps: 8, frameW: 223, frameH: 279 } },
                 anim: 'idle'
             },
@@ -300,18 +300,18 @@ const CINE_TRANSITION = [
 // Cinématique 3 : FIN
 const CINE_END = [
     {
-        background: '../assets/img/backgrounds/jeu_1.jpg',
+        background: '../assets/img/jeu1/jeu_1.jpg',
         music: ['../assets/sound/music/discussion.mp3', 0.2],
         actions: [
             {
-                type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 3, sprite: '../assets/img/characters/lehmann.svg', anims: {
+                type: 'spawn', id: 'lehmann', x: 0.25, y: 0.84, scale: 3, sprite: '../assets/img/jeu1/lehmann.svg', anims: {
                     idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
                     walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 },
                 }, anim: 'idle'
             },
             {
                 type: 'spawn', id: 'npc', x: 1.2, y: 0.80, scale: 1, flip: true,
-                sprite: '../assets/img/characters/benner.png',
+                sprite: '../assets/img/jeu1/benner.png',
                 anims: {
                     idle: { srcY: 66, frames: 4, fps: 4, frameW: 93, frameH: 158 },
                     cast: { srcY: 284, frames: 4, fps: 8, frameW: 93, frameH: 154 },
@@ -435,13 +435,13 @@ const CINE_END = [
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const pigeonSprite = new Image();
-pigeonSprite.src = '../assets/img/characters/pigeon.png';
+pigeonSprite.src = '../assets/img/jeu1/pigeon.png';
 const bgImage = new Image();
-bgImage.src = '../assets/img/backgrounds/jeu_1.jpg';
+bgImage.src = '../assets/img/jeu1/jeu_1.jpg';
 const poopSprite = new Image();
-poopSprite.src = '../assets/img/poop.png';
+poopSprite.src = '../assets/img/jeu1/poop.png';
 const bennerSprite = new Image();
-bennerSprite.src = '../assets/img/characters/lehmann.svg';
+bennerSprite.src = '../assets/img/jeu1/lehmann.svg';
 const BENNER_FRAME_W = 24;
 const BENNER_FRAME_H = 44;
 const BENNER_FRAMES = 8;

@@ -28,6 +28,15 @@ const TRANSLATIONS = {
         'radar.hint-mobile': 'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.',
         'radar.hint-pc':     'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.',
 
+        // ── Jeu 2 ──────────────────────────────────────────────────
+        'jeu2.rules':        'Collecte les ingrédients dans le bon ordre. Méfie-toi des malus.',
+        'jeu2.pause':        'PAUSE',
+        'jeu2.quit':         'QUITTER',
+        'jeu2.victory':      'VICTOIRE !',
+        'jeu2.victory-sub':  'Tu as gagné une tenue Mulhousienne.',
+        'jeu2.continue':     'CONTINUER',
+        'jeu2.replay':       'REJOUER',
+
         // ── Carte ──────────────────────────────────────────────────
         'carte.mission':         'MISSION',
         'carte.searching':       'Recherche GPS...',
@@ -42,6 +51,7 @@ const TRANSLATIONS = {
         'carte.finished-title':  'Aventure terminée !',
         'carte.finished-sub':    'Tu as complété toutes les étapes. Bravo !',
         'carte.dist':            'Distance : {d}',
+        'carte.in-zone':         'Tu es à Mulhouse ! ✓',
     },
     en: {
         // ── Main menu ──────────────────────────────────────────────
@@ -72,6 +82,15 @@ const TRANSLATIONS = {
         'radar.hint-mobile': 'Use GPS and compass<br>to find the 3 targets.',
         'radar.hint-pc':     'Move around to find<br>the 3 targets on the radar.',
 
+        // ── Game 2 ────────────────────────────────────────────────
+        'jeu2.rules':        'Collect all ingredients in the right order. Watch out for debuffs.',
+        'jeu2.pause':        'PAUSE',
+        'jeu2.quit':         'QUIT',
+        'jeu2.victory':      'VICTORY!',
+        'jeu2.victory-sub':  'You won a Mulhousien outfit.',
+        'jeu2.continue':     'CONTINUE',
+        'jeu2.replay':       'REPLAY',
+
         // ── Map ────────────────────────────────────────────────────
         'carte.mission':         'MISSION',
         'carte.searching':       'Looking for GPS...',
@@ -86,6 +105,7 @@ const TRANSLATIONS = {
         'carte.finished-title':  'Adventure complete!',
         'carte.finished-sub':    'You completed every step. Well done!',
         'carte.dist':            '{d} away',
+        'carte.in-zone':         'You are in Mulhouse! ✓',
     }
 };
 

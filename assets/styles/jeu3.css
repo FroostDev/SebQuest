@@ -1,0 +1,337 @@
+* {
+    box-sizing: border-box;
+}
+
+@font-face {
+    font-family: 'Joyquest';
+    src: url('fonts/JoyquestSample.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'RetroTalk';
+    src: url('fonts/Jersey10-Regular.ttf') format('truetype');
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0d0d14;
+    overflow: hidden;
+    font-family: 'Joyquest', monospace;
+    touch-action: none;
+    user-select: none;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    image-rendering: pixelated; /* EXPLICIT PIXEL ART RENDERING */
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 13, 20, 0.85);
+    pointer-events: auto;
+    color: #fff;
+    text-align: center;
+    transition: opacity 0.3s;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none !important;
+}
+.hidden * {
+    pointer-events: none !important;
+}
+
+.title {
+    font-size: 36px;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    text-shadow: 4px 4px 0px #000;
+    color: #ffeb3b;
+    animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.hud-top {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    text-shadow: 2px 2px 0px #000;
+}
+
+.score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#scoreEl {
+    font-size: 24px;
+    color: #fff;
+}
+
+.combo-text {
+    font-size: 14px;
+    color: #ff5722;
+    margin-top: 5px;
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.money-display {
+    font-size: 24px;
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.coin-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: #ffeb3b;
+    border-radius: 0; /* Pixel art block */
+    box-shadow: inset -4px -4px 0 #f57f17, 2px 2px 0 #000;
+}
+
+.button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-family: inherit;
+    background: #ff5722;
+    color: #fff;
+    border: 4px solid #fff;
+    border-radius: 0;
+    box-shadow: 6px 6px 0px #000;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin: 10px;
+    pointer-events: auto;
+    transition: transform 0.1s;
+    image-rendering: pixelated;
+}
+
+.button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+.top-btn {
+    position: absolute;
+    top: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 20;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.instructions {
+    margin-top: 40px;
+    font-size: 11px;
+    color: #aaa;
+    max-width: 80%;
+    line-height: 1.8;
+    text-shadow: 1px 1px 0 #000;
+}
+
+.stats {
+    margin-top: 20px;
+    color: #4caf50;
+    font-size: 16px;
+}
+
+.game-over-title {
+    color: #f44336;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 4px 4px 0 #000;
+}
+
+.stat-row {
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.highlight {
+    color: #ffeb3b;
+}
+
+/* Biome Toast */
+@keyframes toastFadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    15% { opacity: 1; transform: translateY(0); }
+    85% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.biome-toast {
+    position: absolute;
+    top: 80px;
+    left: 20px;
+    background: rgba(13, 13, 20, 0.85);
+    color: #fff;
+    font-family: 'Joyquest', monospace;
+    font-size: 16px;
+    padding: 10px 16px;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    z-index: 1000;
+    pointer-events: none;
+    animation: toastFadeInOut 3s forwards;
+    text-shadow: 2px 2px 0px #000;
+}
+
+/* Styles moved from inline to CSS */
+#pauseBtn {
+    right: 20px;
+    display: none;
+}
+
+#soundBtn {
+    right: 70px;
+}
+
+#settingsBtn {
+    font-size: 14px;
+    padding: 10px 20px;
+}
+
+.params-title {
+    font-size: 24px;
+    color: #fff;
+}
+
+.gyro-label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#gyroToggle {
+    width: 24px;
+    height: 24px;
+}
+
+.instructions-settings {
+    margin-top: 20px;
+}
+
+#closeSettingsBtn {
+    margin-top: 40px;
+}
+
+.pause-title {
+    color: #fff;
+}
+
+.final-stat-row {
+    margin-bottom: 40px;
+}
+
+.lifetime-stats {
+    margin-top: 30px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 4px solid #555;
+    border-radius: 0;
+    width: 80%;
+    max-width: 400px;
+    text-align: left;
+    box-shadow: 6px 6px 0px #000;
+}
+
+.lifetime-stats-title {
+    color: #ffeb3b;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+.stats-grid div {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+}
+
+#countdownScreen {
+    background: rgba(13, 13, 20, 0.6);
+}
+
+.countdown-text {
+    font-size: 120px;
+    color: #00e5ff;
+    text-shadow: 6px 6px 0 #000;
+    animation: zoomPulse 1s ease-out infinite;
+}
+
+@keyframes zoomPulse {
+    0% { transform: scale(0.5); opacity: 0; }
+    30% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
