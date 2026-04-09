@@ -19,29 +19,45 @@ const LEVELS = [
                         sprite: '../assets/img/characters/lehmann.svg',
                         anims: {
                             idle: { srcY: 4,  frames: 8, fps: 8,  frameW: 24, frameH: 44 },
-                            walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 },
+                            walk: { srcY: 52, frames: 7, fps: 14, frameW: 24, frameH: 44 }
                         },
                         anim: 'walk'
                     },
-                    { type: 'move', id: 'lehmann', x: 0.22, duration: 1400 },
+                    { type: 'move', id: 'lehmann', x: 0.25, duration: 1800 },
                     { type: 'anim', id: 'lehmann', anim: 'idle' },
                 ],
                 speaker: 'lehmann',
-                text: "Écoute bien, jeune aventurier !",
+                text: "Mulhouse. Ville calme, bonne réputation. Exactement ce qu'il me fallait.",
             },
             {
                 speaker: 'lehmann',
-                text: "Pour démarrer ta quête, tu dois d'abord rejoindre le Jardin des Senteurs !",
+                text: "Je me suis blessé l'orteil. Franchement, ça fait mal.",
             },
             {
                 speaker: 'lehmann',
-                text: "Suis l'itinéraire sur la carte. Le jeu se lancera automatiquement une fois sur place !",
+                text: "Le médecin a dit : 'Reposez-vous.' Mais bon, je me faisait chier.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Alors j'ai cherché un endroit tranquille. Pas trop de bruit. Pas trop de marche. Un peu de verdure.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Le Jardin des Senteurs. Ça m'a intrigué.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Quelques minutes à pied depuis l'Université Populaire. L'orteil va survivre.",
+            },
+            {
+                speaker: 'lehmann',
+                text: "Allez. En route. Doucement.",
             },
             {
                 actions: [
                     { type: 'anim', id: 'lehmann', anim: 'walk' },
                     { type: 'flip', id: 'lehmann' },
-                    { type: 'move', id: 'lehmann', x: 1.2, duration: 1000 },
+                    { type: 'move', id: 'lehmann', x: 1.2, duration: 1200 },
                 ],
                 text: "",
             },
