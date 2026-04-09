@@ -1,6 +1,5 @@
 const TRANSLATIONS = {
     fr: {
-        // ── Menu principal ─────────────────────────────────────────
         'menu.enter':   'Commencer',
         'menu.start':   'Demarrer',
         'menu.reset':   'Recommencer depuis le début',
@@ -8,7 +7,6 @@ const TRANSLATIONS = {
         'reset.yes':    'Oui',
         'reset.no':     'Non',
 
-        // ── Jeu commun ─────────────────────────────────────────────
         'game.launch':      'Commencer',
         'game.play':        'JOUER',
         'game.resume':      'Reprendre',
@@ -18,17 +16,19 @@ const TRANSLATIONS = {
         'game.win':         'Gagner la partie',
         'game.restart':     'Recommencer',
 
-        // ── Partie pigeon ──────────────────────────────────────────
         'pigeon.hint-mobile': "Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.",
         'pigeon.hint-pc':     '← → ou A D pour viser.<br>Espace ou clic pour lâcher une bombe.',
         'pigeon.tap-replay':  'Tape pour rejouer',
 
-        // ── Partie radar ───────────────────────────────────────────
-        'radar.title':       'RADAR ODORANT',
-        'radar.hint-mobile': 'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.',
-        'radar.hint-pc':     'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.',
+        'radar.title':          'RADAR ODORANT',
+        'radar.hint-mobile':    'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.',
+        'radar.hint-pc':        'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.',
+        'radar.win-title':      'VICTOIRE !',
+        'radar.win-sub':        'Tu as trouvé les 3 cibles.',
+        'radar.win-replay':     'Tape pour rejouer depuis le début',
+        'radar.gameover-title': 'TEMPS ÉCOULÉ !',
+        'radar.gameover-retry': 'Tape pour réessayer le radar',
 
-        // ── Jeu 2 ──────────────────────────────────────────────────
         'jeu2.rules':        'Collecte les ingrédients dans le bon ordre. Méfie-toi des malus.',
         'jeu2.pause':        'PAUSE',
         'jeu2.quit':         'QUITTER',
@@ -37,7 +37,6 @@ const TRANSLATIONS = {
         'jeu2.continue':     'CONTINUER',
         'jeu2.replay':       'REJOUER',
 
-        // ── Carte ──────────────────────────────────────────────────
         'carte.mission':         'MISSION',
         'carte.searching':       'Recherche GPS...',
         'carte.resume':          'Reprendre',
@@ -54,7 +53,6 @@ const TRANSLATIONS = {
         'carte.in-zone':         'Tu es à Mulhouse ! ✓',
     },
     en: {
-        // ── Main menu ──────────────────────────────────────────────
         'menu.enter':   'Start',
         'menu.start':   'Start',
         'menu.reset':   'Restart from the beginning',
@@ -62,7 +60,6 @@ const TRANSLATIONS = {
         'reset.yes':    'Yes',
         'reset.no':     'No',
 
-        // ── Game common ────────────────────────────────────────────
         'game.launch':      'Start',
         'game.play':        'PLAY',
         'game.resume':      'Resume',
@@ -72,17 +69,19 @@ const TRANSLATIONS = {
         'game.win':         'Win the game',
         'game.restart':     'Restart',
 
-        // ── Pigeon phase ───────────────────────────────────────────
         'pigeon.hint-mobile': 'Tilt your phone to aim.<br>Tap the screen to drop a bomb.',
         'pigeon.hint-pc':     '← → or A D to aim.<br>Space or click to drop a bomb.',
         'pigeon.tap-replay':  'Tap to replay',
 
-        // ── Radar phase ────────────────────────────────────────────
-        'radar.title':       'SCENT RADAR',
-        'radar.hint-mobile': 'Use GPS and compass<br>to find the 3 targets.',
-        'radar.hint-pc':     'Move around to find<br>the 3 targets on the radar.',
+        'radar.title':          'SCENT RADAR',
+        'radar.hint-mobile':    'Use GPS and compass<br>to find the 3 targets.',
+        'radar.hint-pc':        'Move around to find<br>the 3 targets on the radar.',
+        'radar.win-title':      'VICTORY!',
+        'radar.win-sub':        'You found all 3 targets.',
+        'radar.win-replay':     'Tap to replay from the start',
+        'radar.gameover-title': 'TIME\'S UP!',
+        'radar.gameover-retry': 'Tap to retry the radar',
 
-        // ── Game 2 ────────────────────────────────────────────────
         'jeu2.rules':        'Collect all ingredients in the right order. Watch out for debuffs.',
         'jeu2.pause':        'PAUSE',
         'jeu2.quit':         'QUIT',
@@ -91,7 +90,6 @@ const TRANSLATIONS = {
         'jeu2.continue':     'CONTINUE',
         'jeu2.replay':       'REPLAY',
 
-        // ── Map ────────────────────────────────────────────────────
         'carte.mission':         'MISSION',
         'carte.searching':       'Looking for GPS...',
         'carte.resume':          'Resume',
@@ -108,8 +106,6 @@ const TRANSLATIONS = {
         'carte.in-zone':         'You are in Mulhouse! ✓',
     }
 };
-
-// ── Helpers ────────────────────────────────────────────────────
 
 function getLang() {
     return localStorage.getItem('gamelang') || 'fr';

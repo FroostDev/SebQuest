@@ -1,10 +1,9 @@
-// ══════════════════════════════════════════════════════════════════
+// ========================================================
 //  TRADUCTIONS DES CINÉMATIQUES DE BRIEFING
 //  Textes injectés via applyCineTexts() au moment du play.
-//  L'ordre correspond aux steps non-vides du briefing de chaque niveau.
-// ══════════════════════════════════════════════════════════════════
+// ========================================================
 const BRIEFING_TEXTS = [
-    // Niveau 0 — Jardin des Senteurs
+    // Niveau 0 : Jardin des Senteurs
     {
         fr: [
             "Mulhouse. Ville calme, bonne réputation. Exactement ce qu'il me fallait.",
@@ -25,7 +24,7 @@ const BRIEFING_TEXTS = [
             "Alright. Let's go. Slowly.",
         ],
     },
-    // Niveau 1 — intro jeu2
+    // Niveau 1 : intro Place de la concorde
     {
         fr: [
             "Sérieusement, ce pigeon... C'est quoi son problème ? Il a confondu mon épaule avec une zone de déploiement ?",
@@ -42,18 +41,18 @@ const BRIEFING_TEXTS = [
             "Okay, the ghost is a bit old-school, but he's right. To the river! Time to craft a little textile patch.",
         ],
     },
-    // Niveau 2 — pas de cinématique (transition assurée par la fin de jeu2)
+    // Niveau 2 : pas de cinématique (transition assurée par la fin de jeu2)
     { fr: [], en: [] },
 ];
 
-// =======
+// ========
 //  NIVEAUX
-// =======
+// ========
 const LEVELS = [
     {
         destination: {
-            lat: 47.729522781882245,
-            lng: 7.301288857836423,
+            lat: 47.74778943745152,
+            lng: 7.333354982597076,
             name: "Jardin des Senteurs",
         },
         game: 'jeu1.html',
@@ -113,9 +112,9 @@ const LEVELS = [
     },
     {
         destination: {
-            lat: 47.729522781882245,
-            lng: 7.301288857836423,
-            name: "Prochaine Destination",
+            lat: 47.746694318588105,
+            lng: 7.335166734278392,
+            name: "Place de la concorde",
         },
         game: 'jeu2.html',
         briefing: [
@@ -179,18 +178,18 @@ const LEVELS = [
     },
 ];
 
-const ARRIVAL_RADIUS = 300; 
+const ARRIVAL_RADIUS = 40; 
 
-// ==========
+// ============
 //  PROGRESSION
-// ==========
+// ============
 function getLevel() {
     return parseInt(localStorage.getItem('sebquest_level') || '0', 10);
 }
 
-// ===========
+// ===============
 //  INITIALISATION
-// ===========
+// ===============
 window.addEventListener('load', () => {
     const level = getLevel();
 
@@ -227,9 +226,9 @@ window.addEventListener('load', () => {
     }
 });
 
-// =====
+// ======
 //  CARTE
-// =====
+// ======
 let map, userMarker, routeControl, watchId;
 let arrived = false;
 
@@ -338,9 +337,9 @@ function triggerArrival(level) {
     }, 2500);
 }
 
-// ==============
+// ==================
 //  FIN DE L'AVENTURE
-// ==============
+// ==================
 function showFinished() {
     const overlay = document.getElementById('arrival-overlay');
     document.getElementById('arrival-title').textContent = t('carte.finished-title');
@@ -348,9 +347,9 @@ function showFinished() {
     overlay.style.display = 'flex';
 }
 
-// =========
+// ===============
 //  ROUTING PIÉTON
-// =========
+// ===============
 function fetchRoute(lat, lng, dest) {
     const url = `https://router.project-osrm.org/route/v1/foot/${lng},${lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson`;
 
@@ -367,7 +366,7 @@ function fetchRoute(lat, lng, dest) {
             }).addTo(map);
         })
         .catch(() => {
-            // Fallback ligne droite si OSRM indisponible
+            // Si la requête vers OSRM ne répond pas comme prévu, tracé une ligne droite entre les deux points
             if (routeControl) map.removeLayer(routeControl);
             routeControl = L.polyline([[lat, lng], [dest.lat, dest.lng]], {
                 color: '#FFAA2A',
@@ -378,9 +377,9 @@ function fetchRoute(lat, lng, dest) {
         });
 }
 
-// =========
+// ===========
 //  MENU PAUSE
-// =========
+// ===========
 document.getElementById('carte-pause-btn').addEventListener('click', () => {
     document.getElementById('carte-pause-menu').classList.add('open');
 });
@@ -393,24 +392,21 @@ document.getElementById('carte-menu-btn').addEventListener('click', () => {
     window.location.href = '../index.html';
 });
 
-// ══════════════════════════════════════════════════════════════════
+// ================================================================
 //  TRADUCTION — initialisation et réaction au changement de langue
-// ══════════════════════════════════════════════════════════════════
+// ================================================================
 applyLang();
 
 window.addEventListener('langchange', () => {
-    // applyLang() a déjà mis à jour les data-i18n.
-    // La distance s'auto-mettra à jour au prochain callback GPS.
-    // On rafraîchit le texte "GPS en attente" si la carte est visible et la distance statique.
     const distEl = document.getElementById('map-distance');
     if (distEl && distEl.getAttribute('data-i18n') === 'carte.searching') {
         distEl.textContent = t('carte.searching');
     }
 });
 
-// =========
+// ============
 //  UTILITAIRES
-// =========
+// ============
 function haversine(lat1, lng1, lat2, lng2) {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;

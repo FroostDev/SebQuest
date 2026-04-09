@@ -23,12 +23,12 @@ function open_menu() {
 start_main_menu.addEventListener("click", launch_start_menu);
 hamburger_btn.addEventListener("click", open_menu);
 
-// Lancement normal → pas de dev mode
+// Lancement normal -> pas de dev mode
 document.querySelector('.start_game_btn').addEventListener('click', () => {
     localStorage.setItem('devMode', 'false');
 });
 
-// Lancement depuis le menu hamburger → dev mode
+// Lancement depuis le menu hamburger -> dev mode
 document.querySelectorAll('#nav a[href]').forEach(link => {
     if (!link.getAttribute('href')) return;
     link.addEventListener('click', () => {

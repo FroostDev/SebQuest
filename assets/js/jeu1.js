@@ -1335,10 +1335,10 @@ function drawRadar() {
         rctx.font = 'bold 38px monospace';
         rctx.textAlign = 'center';
         rctx.textBaseline = 'middle';
-        rctx.fillText('TEMPS ÉCOULÉ !', w / 2, h / 2 - 30);
+        rctx.fillText(t('radar.gameover-title'), w / 2, h / 2 - 30);
         rctx.fillStyle = '#fff';
         rctx.font = '18px monospace';
-        rctx.fillText('Tape pour réessayer le radar', w / 2, h / 2 + 20);
+        rctx.fillText(t('radar.gameover-retry'), w / 2, h / 2 + 20);
     }
 
     if (radarWin) {
@@ -1348,13 +1348,13 @@ function drawRadar() {
         rctx.font = 'bold 38px monospace';
         rctx.textAlign = 'center';
         rctx.textBaseline = 'middle';
-        rctx.fillText('VICTOIRE !', w / 2, h / 2 - 40);
+        rctx.fillText(t('radar.win-title'), w / 2, h / 2 - 40);
         rctx.fillStyle = '#fff';
         rctx.font = '20px monospace';
-        rctx.fillText('Tu as trouvé les 3 cibles.', w / 2, h / 2 + 10);
+        rctx.fillText(t('radar.win-sub'), w / 2, h / 2 + 10);
         rctx.font = '15px monospace';
         rctx.fillStyle = 'rgba(255,255,255,0.7)';
-        rctx.fillText('Tape pour rejouer depuis le début', w / 2, h / 2 + 50);
+        rctx.fillText(t('radar.win-replay'), w / 2, h / 2 + 50);
     }
 }
 
