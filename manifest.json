@@ -1,0 +1,31 @@
+{
+  "name": "Seb Quest",
+  "short_name": "SebQuest",
+  "description": "Aventure urbaine à Mulhouse",
+  "theme_color": "#0e0e1a",
+  "background_color": "#0e0e1a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/?utm_source=pwa",
+  "icons": [
+    {
+      "src": "assets/img/menu/game_title.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/jeu1/pigeon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/img/jeu1/pigeon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

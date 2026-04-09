@@ -1,7 +1,7 @@
 // --- CINÉMATIQUE D'INTRO (fin jeu2 / devMode) ---
 const JEU3_INTRO_STEPS = [
     {
-        background: '../assets/img/jeu2/background2.png',
+        background: '../assets/img/jeu2/background2.jpg',
         actions: [
             { type: 'spawn', id: 'dollfus', x: 0.8, y: 0.8, sprite: '../assets/img/jeu2/dollfus.png', anims: { idle: { srcY: 0, frameW: 109, frameH: 191, cols: 4, frames: 4, fps: 8 } }, scale: 0.7, flip: true }
         ],
@@ -585,8 +585,8 @@ function triggerCinematic(characterId, characterName, textArray, castIndex, onEn
         }
 
         let logicCanvas = {
-            width: cw,
-            height: ch,
+            get width() { return cw; },
+            get height() { return ch; },
             getContext: () => ctx,
             addEventListener: (...args) => canvas.addEventListener(...args),
             removeEventListener: (...args) => canvas.removeEventListener(...args)
@@ -2117,7 +2117,14 @@ $soundBtn.innerText = soundEnabled ? '🔊' : '🔇';
 
 if (localStorage.getItem('devMode') === 'true') {
     document.getElementById('menuScreen').classList.add('hidden');
-    Cinematic.play(canvas, applyCineTexts(JEU3_INTRO_STEPS, JEU3_INTRO_TEXTS[currentLang]), () => {
+    let logicCanvas = {
+        get width() { return cw; },
+        get height() { return ch; },
+        getContext: () => ctx,
+        addEventListener: (...args) => canvas.addEventListener(...args),
+        removeEventListener: (...args) => canvas.removeEventListener(...args)
+    };
+    Cinematic.play(logicCanvas, applyCineTexts(JEU3_INTRO_STEPS, JEU3_INTRO_TEXTS[currentLang]), () => {
         document.getElementById('menuScreen').classList.remove('hidden');
     });
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="assets/styles/base.css">
     <link rel="stylesheet" href="assets/styles/main_menu.css">
 </head>
+
 <body>
     <button class="lang-toggle-btn" id="lang-btn-header" onclick="toggleLang()">🇬🇧 EN</button>
 
@@ -25,7 +27,8 @@
         </nav>
     </header>
 
-    <div class="start_overlay" id="start_overlay"><button class="yellow_btn_style" data-i18n="menu.enter">Commencer</button></div>
+    <div class="start_overlay" id="start_overlay"><button class="yellow_btn_style"
+            data-i18n="menu.enter">Commencer</button></div>
 
     <div class="header_container">
         <div class="game_title"><img src='assets/img/menu/game_title.svg' alt='Seb Quest'></div>
@@ -43,7 +46,13 @@
         </div>
     </div>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     <script src="assets/js/lang.js"></script>
     <script src="assets/js/main_menu.js"></script>
 </body>
+
 </html>

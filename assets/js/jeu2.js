@@ -135,7 +135,7 @@ const introSteps = [
 
 const victorySteps = [
     {
-        background: '../assets/img/jeu2/background2.png',
+        background: '../assets/img/jeu2/background2.jpg',
         actions: [
             { type: 'spawn', id: 'dollfus', x: 0.8, y: 0.8, sprite: '../assets/img/jeu2/dollfus.png', anims: { idle: { srcY: 0, frameW: 109, frameH: 191, cols: 4, frames: 4, fps: 8 } }, scale: 0.7, flip:true }
         ],
