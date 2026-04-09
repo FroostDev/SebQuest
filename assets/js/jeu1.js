@@ -529,6 +529,7 @@ window.addEventListener('keyup', e => { keys[e.key] = false; });
 function updateHPBar() {
     const fill = document.getElementById('hp-fill');
     if (fill) fill.setAttribute('width', Math.max(0, (hp / 100) * HP_BAR_MAX_W).toFixed(1));
+    window.navigator.vibrate([200, 100]);
 }
 
 /**
@@ -739,6 +740,10 @@ const skipToRadar = () => {
 };
 document.getElementById('skip-radar-btn').addEventListener('click', skipToRadar);
 document.getElementById('skip-radar-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); skipToRadar(); }, { passive: true });
+
+const goToMenu = () => { window.location.href = '../index.html'; };
+document.getElementById('pigeon-menu-btn').addEventListener('click', goToMenu);
+document.getElementById('pigeon-menu-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); goToMenu(); }, { passive: true });
 
 /**
  * Boucle principale du jeu, tourne en permanence.
@@ -991,6 +996,7 @@ function _launchRadar() {
     radarCanvas.style.display = 'block';
     document.getElementById('pigeon-pause-btn').style.display = 'none';
     document.getElementById('radar-pause-btn').style.display = 'flex';
+    document.getElementById('radar-skip-target-btn').style.display = 'block';
 
     updateTimerBar(1);
     document.getElementById('hp-fill').setAttribute('width', '0');
@@ -1266,12 +1272,23 @@ function winRadar() {
 }
 
 document.getElementById('radar-pause-btn').addEventListener('click', pauseRadar);
+
+document.getElementById('radar-skip-target-btn').addEventListener('click', () => {
+    if (!currentPos || radarGameOver || radarWin || radarTargets.length === 0) return;
+    const cosLat = Math.cos(currentPos.lat * Math.PI / 180);
+    const angle = Math.random() * 2 * Math.PI;
+    const dist = 8 + Math.random() * 7;
+    radarTargets[radarCurrentTarget] = {
+        lat: currentPos.lat + (dist / 111320) * Math.cos(angle),
+        lng: currentPos.lng + (dist / (111320 * cosLat)) * Math.sin(angle)
+    };
+});
 document.getElementById('resume-btn').addEventListener('click', resumeRadar);
 document.getElementById('win-btn').addEventListener('click', winRadar);
+document.getElementById('radar-menu-btn').addEventListener('click', goToMenu);
+document.getElementById('radar-menu-btn').addEventListener('touchstart', (e) => { e.stopPropagation(); goToMenu(); }, { passive: true });
 document.getElementById('restart-radar-btn').addEventListener('click', () => {
     document.getElementById('radar-pause-menu').classList.remove('open');
-    handleRadarTap();
-    if (radarGameOver) return;
     stopBeeps();
     stopGeo();
     radarPaused = false;
@@ -1318,14 +1335,14 @@ function handleRadarTap() {
         radarCanvas.style.display = 'none';
         canvas.style.display = 'block';
         document.getElementById('radar-pause-btn').style.display = 'none';
+        document.getElementById('radar-skip-target-btn').style.display = 'none';
         document.getElementById('radar-pause-menu').classList.remove('open');
 
-        // Jouer la cinématique de fin, puis retour au menu
+        // Jouer la cinématique de fin, puis passer au niveau suivant
         Cinematic.play(canvas, CINE_END, () => {
-            gameStarted = false;
-            gameOver = false;
-            betaBase = null;
-            document.getElementById('start-overlay').style.display = 'flex';
+            const currentLevel = parseInt(localStorage.getItem('sebquest_level') || '0', 10);
+            localStorage.setItem('sebquest_level', currentLevel + 1);
+            window.location.href = '../pages/carte.html';
         });
         return;
     }

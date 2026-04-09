@@ -20,3 +20,22 @@ function open_menu() {
 
 start_main_menu.addEventListener("click", launch_start_menu);
 hamburger_btn.addEventListener("click", open_menu);
+
+const resetBtn = document.getElementById('reset-btn');
+const resetOverlay = document.getElementById('reset-confirm-overlay');
+const resetYes = document.getElementById('reset-confirm-yes');
+const resetNo = document.getElementById('reset-confirm-no');
+
+resetBtn.addEventListener('click', () => {
+    resetOverlay.classList.add('open');
+});
+
+resetNo.addEventListener('click', () => {
+    resetOverlay.classList.remove('open');
+});
+
+resetYes.addEventListener('click', () => {
+    localStorage.removeItem('sebquest_level');
+    resetOverlay.classList.remove('open');
+    window.location.href = 'pages/carte.html';
+});

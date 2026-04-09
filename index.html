@@ -27,9 +27,20 @@
 
     <div class="header_container">
         <div class="game_title"><img src='assets/img/game_title.svg' alt='Seb Quest'></div>
-        <a href="" class="start_game_btn yellow_btn_style">Demarrer</a>
+        <a href="pages/carte.html" class="start_game_btn yellow_btn_style">Demarrer</a>
+        <button id="reset-btn" class="reset_btn_style">Recommencer depuis le début</button>
     </div>
-    
+
+    <div id="reset-confirm-overlay">
+        <div id="reset-confirm-box">
+            <p id="reset-confirm-text">Ta progression sera effacée.<br>Es-tu sûr ?</p>
+            <div id="reset-confirm-actions">
+                <button id="reset-confirm-yes" class="yellow_btn_style">Oui</button>
+                <button id="reset-confirm-no" class="yellow_btn_style">Non</button>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/main_menu.js"></script>
 </body>
 </html>

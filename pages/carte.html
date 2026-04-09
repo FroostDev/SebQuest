@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SebQuest - Carte</title>
+
+    <link rel="stylesheet" href="../assets/styles/base.css">
+    <link rel="stylesheet" href="../assets/styles/carte.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
+</head>
+<body>
+
+    <!-- Cinématique -->
+    <canvas id="cinematicCanvas"></canvas>
+
+    <!-- Carte (cachée jusqu'à la fin de la cinématique) -->
+    <div id="map-container">
+        <div id="map"></div>
+
+        <div id="map-panel">
+            <p id="map-mission-label">MISSION</p>
+            <p id="map-destination-name">Jardin des Senteurs</p>
+            <p id="map-distance">Recherche GPS...</p>
+        </div>
+    </div>
+
+    <button id="carte-pause-btn" aria-label="Pause">
+        <span></span><span></span><span></span>
+    </button>
+
+    <div id="carte-pause-menu">
+        <ul>
+            <li><button id="carte-resume-btn">Reprendre</button></li>
+            <li><button id="carte-menu-btn">Retour au menu</button></li>
+        </ul>
+    </div>
+
+    <!-- Overlay d'arrivée -->
+    <div id="arrival-overlay">
+        <p id="arrival-title">Zone atteinte !</p>
+        <p id="arrival-sub">Le jeu démarre...</p>
+    </div>
+
+    <script src="../assets/js/cinematic.js"></script>
+    <script src="../assets/js/carte.js"></script>
+</body>
+</html>

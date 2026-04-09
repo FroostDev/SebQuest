@@ -1,6 +1,6 @@
 body {
     background-image: url("../img/backgrounds/intro.jpg");
-    background-size: 100%;
+    background-size: 100% 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,6 +21,68 @@ body {
     flex-direction: column;
     gap: 16px;
     margin-top: 128px;
+}
+
+.reset_btn_style {
+    background: var(--white);
+    padding: 4px 16px;
+    border: none;
+    font-family: "RetroTalk", monospace;
+    font-size: 15px;
+    color: var(--yellow);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    margin-top: 8px;
+}
+
+#reset-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+}
+
+#reset-confirm-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+
+#reset-confirm-box {
+    background: #0a0a0a;
+    border: 2px solid var(--yellow);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    max-width: 320px;
+    text-align: center;
+}
+
+#reset-confirm-text {
+    font-family: "RetroTalk", monospace;
+    font-size: 20px;
+    color: var(--white);
+    line-height: 1.5;
+}
+
+#reset-confirm-actions {
+    display: flex;
+    gap: 20px;
+}
+
+#reset-confirm-actions .yellow_btn_style {
+    font-size: 20px;
+    padding: 4px 24px;
 }
 
 .game_title {
