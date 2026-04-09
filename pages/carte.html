@@ -24,9 +24,9 @@
         <div id="map"></div>
 
         <div id="map-panel">
-            <p id="map-mission-label">MISSION</p>
+            <p id="map-mission-label" data-i18n="carte.mission">MISSION</p>
             <p id="map-destination-name">Jardin des Senteurs</p>
-            <p id="map-distance">Recherche GPS...</p>
+            <p id="map-distance" data-i18n="carte.searching">Recherche GPS...</p>
         </div>
     </div>
 
@@ -36,17 +36,19 @@
 
     <div id="carte-pause-menu">
         <ul>
-            <li><button id="carte-resume-btn">Reprendre</button></li>
-            <li><button id="carte-menu-btn">Retour au menu</button></li>
+            <li><button id="carte-resume-btn" data-i18n="carte.resume">Reprendre</button></li>
+            <li><button id="carte-menu-btn" data-i18n="carte.back-menu">Retour au menu</button></li>
+            <li><button class="lang-toggle-btn" onclick="toggleLang()">🇬🇧 EN</button></li>
         </ul>
     </div>
 
     <!-- Overlay d'arrivée -->
     <div id="arrival-overlay">
-        <p id="arrival-title">Zone atteinte !</p>
-        <p id="arrival-sub">Le jeu démarre...</p>
+        <p id="arrival-title" data-i18n="carte.arrival-title">Zone atteinte !</p>
+        <p id="arrival-sub" data-i18n="carte.arrival-sub">Le jeu démarre...</p>
     </div>
 
+    <script src="../assets/js/lang.js"></script>
     <script src="../assets/js/cinematic.js"></script>
     <script src="../assets/js/carte.js"></script>
 </body>

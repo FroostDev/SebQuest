@@ -23,6 +23,27 @@ body {
     margin-top: 128px;
 }
 
+/* ── Bouton langue (menu principal) ── */
+#lang-btn-header {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1000001;
+    background: rgba(0, 0, 0, 0.55);
+    border: 2px solid var(--yellow);
+    color: var(--yellow);
+    font-family: "RetroTalk", monospace;
+    font-size: 15px;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    line-height: 1;
+}
+
+#lang-btn-header:hover {
+    background: rgba(255, 170, 42, 0.15);
+}
+
 .reset_btn_style {
     background: var(--white);
     padding: 4px 16px;

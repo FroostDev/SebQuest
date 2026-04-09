@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="assets/styles/main_menu.css">
 </head>
 <body>
+    <button class="lang-toggle-btn" id="lang-btn-header" onclick="toggleLang()">🇬🇧 EN</button>
+
     <header>
         <div class="hamburger_menu" id="hamburger_menu">
             <span></span>
@@ -23,24 +25,25 @@
         </nav>
     </header>
 
-    <div class="start_overlay" id="start_overlay"><button class="yellow_btn_style">Commencer</button></div>
+    <div class="start_overlay" id="start_overlay"><button class="yellow_btn_style" data-i18n="menu.enter">Commencer</button></div>
 
     <div class="header_container">
         <div class="game_title"><img src='assets/img/game_title.svg' alt='Seb Quest'></div>
-        <a href="pages/carte.html" class="start_game_btn yellow_btn_style">Demarrer</a>
-        <button id="reset-btn" class="reset_btn_style">Recommencer depuis le début</button>
+        <a href="pages/carte.html" class="start_game_btn yellow_btn_style" data-i18n="menu.start">Démarrer</a>
+        <button id="reset-btn" class="reset_btn_style" data-i18n="menu.reset">Recommencer depuis le début</button>
     </div>
 
     <div id="reset-confirm-overlay">
         <div id="reset-confirm-box">
-            <p id="reset-confirm-text">Ta progression sera effacée.<br>Es-tu sûr ?</p>
+            <p id="reset-confirm-text" data-i18n-html="reset.text">Ta progression sera effacée.<br>Es-tu sûr ?</p>
             <div id="reset-confirm-actions">
-                <button id="reset-confirm-yes" class="yellow_btn_style">Oui</button>
-                <button id="reset-confirm-no" class="yellow_btn_style">Non</button>
+                <button id="reset-confirm-yes" class="yellow_btn_style" data-i18n="reset.yes">Oui</button>
+                <button id="reset-confirm-no" class="yellow_btn_style" data-i18n="reset.no">Non</button>
             </div>
         </div>
     </div>
 
+    <script src="assets/js/lang.js"></script>
     <script src="assets/js/main_menu.js"></script>
 </body>
 </html>

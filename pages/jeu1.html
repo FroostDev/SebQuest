@@ -12,7 +12,7 @@
 <body>
     <div id="game-launch-overlay"
         style="position:fixed;inset:0;z-index:999999;backdrop-filter:blur(20px);display:flex;justify-content:center;align-items:center;">
-        <button id="game-launch-btn" class="yellow_btn_style"
+        <button id="game-launch-btn" class="yellow_btn_style" data-i18n="game.launch"
             style="font-family:'Retro',monospace;font-size:1.4rem;padding:16px 48px;">Commencer</button>
     </div>
 
@@ -83,13 +83,14 @@
 
     <div id="pigeon-pause-menu">
         <ul>
-            <li><button id="pigeon-resume-btn">Reprendre</button></li>
-            <li><button id="skip-radar-btn">Passer au radar</button></li>
-            <li><button id="pigeon-menu-btn">Retour au menu</button></li>
+            <li><button id="pigeon-resume-btn" data-i18n="game.resume">Reprendre</button></li>
+            <li><button id="skip-radar-btn" data-i18n="game.skip-radar">Passer au radar</button></li>
+            <li><button id="pigeon-menu-btn" data-i18n="game.back-menu">Retour au menu</button></li>
+            <li><button class="lang-toggle-btn" onclick="toggleLang()">🇬🇧 EN</button></li>
         </ul>
     </div>
 
-    <button id="radar-skip-target-btn">La cible est impossible à atteindre ?<br>Clique ici</button>
+    <button id="radar-skip-target-btn" data-i18n-html="game.skip-target">La cible est impossible à atteindre ?<br>Clique ici</button>
 
     <button id="radar-pause-btn" aria-label="Pause">
         <span></span><span></span><span></span>
@@ -97,19 +98,21 @@
 
     <div id="radar-pause-menu">
         <ul>
-            <li><button id="resume-btn">Reprendre</button></li>
-            <li><button id="win-btn">Gagner la partie</button></li>
-            <li><button id="restart-radar-btn">Recommencer</button></li>
-            <li><button id="radar-menu-btn">Retour au menu</button></li>
+            <li><button id="resume-btn" data-i18n="game.resume">Reprendre</button></li>
+            <li><button id="win-btn" data-i18n="game.win">Gagner la partie</button></li>
+            <li><button id="restart-radar-btn" data-i18n="game.restart">Recommencer</button></li>
+            <li><button id="radar-menu-btn" data-i18n="game.back-menu">Retour au menu</button></li>
+            <li><button class="lang-toggle-btn" onclick="toggleLang()">🇬🇧 EN</button></li>
         </ul>
     </div>
 
     <div id="start-overlay" style="display:none">
         <h1>PIGEON ATTACK</h1>
-        <p id="controls-hint">Incline ton téléphone pour viser.<br>Tape l'écran pour lâcher une bombe.</p>
-        <button id="start-btn">JOUER</button>
+        <p id="controls-hint"></p>
+        <button id="start-btn" data-i18n="game.play">JOUER</button>
     </div>
 
+    <script src="../assets/js/lang.js"></script>
     <script src="../assets/js/cinematic.js"></script>
     <script src="../assets/js/jeu1.js"></script>
 </body>

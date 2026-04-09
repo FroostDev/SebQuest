@@ -1,3 +1,122 @@
+const CINE_TEXTS = {
+    fr: {
+        intro: [
+            "Mais il est super ce parc !",
+            "JE SUIS ROLF BENNER ! LE MAÎTRE DE CES LIEUX ! J'AI DEVELO...",
+            "ATTENDS ! Tu as bien dit développer ? Oh ! J'en ai une !",
+            "Que dit un dev qui a oublié de définir sa liste en HTML ?",
+            "Qu'est-ce que tu me racontes là ?",
+            "Il manque ul ! HAHAHAHAHA",
+            "Tu te fous de moi ? En racontant ce genre de blagues sans aucun goût dans mon parc, tu manques de respect aux personnes pour qui j'ai créé ce parc !",
+            "Je vais te montrer ce que ça fait d'être aveugle !",
+            "Aveugle ?",
+            "Obscuris tenebris, caecitas aeterna ! Que les yeux de cet impudent se ferment à jamais !",
+            "COLUMBA CAECITATIS... VENI !!!",
+            "... Un pigeon ?",
+            "Pas n'importe lequel. C'est GUSTAV !",
+            "Hein ? Mais qu'est-ce qu'il fout ce pigeon au-dessus de m... AAAH NON NON NON !",
+        ],
+        transition: [
+            "... C'est chaud. C'est très chaud.",
+            "HAHAHA ! Comment tu te sens ?",
+            "Je vois plus rien ! Gustav il a TOUT mis dans les yeux !",
+            "Gustav a accompli sa mission. Tu vas errer dans mon parc comme une taupe !",
+            "Y'a pas un robinet quelque part ?",
+            "Si. Trois fontaines cachées dans le parc. Trouve-les toutes, et tu retrouveras la vue.",
+            "Trois ?! Je vois même pas mes pieds là !",
+            "J'ai une dernière attention pour toi... Un radar odorant. Il indique la direction. Le reste, c'est ton problème.",
+            "Un radar ? T'es sérieux ?",
+            "Bonne chance, tu vas en avoir besoin.",
+            "OK. OK OK. Je vais les trouver ces trois fontaines. Et après j'ai une blague pour lui sur pourquoi les geeks ne crient pas (enfaite ils URL hehe).",
+        ],
+        end: [
+            "Mes yeux... je revois ! C'est magnifique. Même toi t'es beau, Benner.",
+            "Ne me cherche pas.",
+            "Bon. T'as gagné ce round. Mais c'était quoi tout ça ? Ce parc, Gustav, les fontaines...",
+            "Ce jardin, je l'ai conçu en 1987. Derrière l'Université Populaire.",
+            "1987 ? T'avais quel âge, douze ans ?",
+            "Je l'ai créé pour les personnes malvoyantes et aveugles. Pour qu'elles puissent se repérer... par les odeurs.",
+            "Par les odeurs ?",
+            "Cent trente espèces de plantes. Chacune avec son parfum, sa texture. Des sentiers tactiles. Des panneaux en braille.",
+            "Quelqu'un qui ne voit pas peut traverser ce jardin en entier. Rien qu'en humant l'air et en touchant les feuilles.",
+            "C'est... c'est vraiment beau en fait.",
+            "Et toi, tu viens de le traverser en aveugle. Sans les plantes. Sans le braille. Juste un radar.",
+            "Attends, c'était... un test ? Tu m'as fait vivre ce que vivent les non-voyants ici ?",
+            "Maintenant tu sais pourquoi ce jardin existe. Et pourquoi il mérite qu'on s'en souvienne.",
+            "OK. Chapeau. Vraiment. Mais le coup du pigeon c'était pas obligé.",
+            "Le jardin est orienté plein nord. Les plantes n'ont jamais vraiment bien poussé.",
+            "Hein ? C'est quoi ce rapport ?",
+            "Je dis juste que même les meilleures idées ont leurs défauts. Ce jardin en est la preuve.",
+            "Toi tu veux dire que t'es une bonne idée avec un défaut ?",
+            "Je veux dire que c'est l'intention qui compte. Pas le résultat.",
+            "...",
+            "C'est les anciens fossés de la ville par là, non ?",
+            "Exact. Le jardin est construit sur l'emplacement des anciens remparts. La ville pousse. L'histoire reste dessous.",
+            "Prends soin de tes yeux, Seb. C'est un luxe que tout le monde n'a pas.",
+            "...",
+            "C'était la meilleure fin de niveau de ma vie.",
+        ],
+    },
+    en: {
+        intro: [
+            "This park is awesome!",
+            "I AM ROLF BENNER! MASTER OF THESE GROUNDS! I DEVELO...",
+            "WAIT! Did you say develop? Oh! I've got one!",
+            "Why do web developers make great lovers?",
+            "What are you on about?",
+            "They know how to handle the backend ! HAHAHAHA",
+            "Are you kidding me? Cracking these awful jokes in my park disrespects the people I built it for!",
+            "I'll show you what it's like to be blind!",
+            "Blind?",
+            "Obscuris tenebris, caecitas aeterna! May this impudent one's eyes close forever!",
+            "COLUMBA CAECITATIS... VENI!!!",
+            "... A pigeon?",
+            "Not just any pigeon. It's GUSTAV!",
+            "What? What's that pigeon doing above m... OH NO NO NO!",
+        ],
+        transition: [
+            "... That's rough. That's really rough.",
+            "HAHAHA! How do you feel now ?",
+            "I can't see a thing! Gustav got it ALL in my eyes!",
+            "Gustav has completed his mission. You'll wander my park like a mole!",
+            "Isn't there a tap somewhere?",
+            "Yes. Three fountains hidden in the park. Find them all and you'll get your sight back.",
+            "Three?! I can barely see my own feet!",
+            "One last gift for you... A scent radar. It shows the direction. The rest is your problem.",
+            "A radar? Are you serious?",
+            "Good luck, you're going to need it.",
+            "OK. OK OK. I'll find those three fountains.",
+        ],
+        end: [
+            "My eyes... I can see again! It's beautiful. Even you look good, Benner.",
+            "Don't push it.",
+            "OK. You won this round. But what was all that? This park, Gustav, the fountains...",
+            "I designed this garden in 1987. Behind the Université Populaire.",
+            "1987? How old were you, twelve?",
+            "I created it for visually impaired and blind people. So they could find their way... by scent.",
+            "By scent?",
+            "One hundred and thirty plant species. Each with its own fragrance, its texture. Tactile pathways. Braille signs.",
+            "Someone who can't see can walk through this garden entirely. Just by smelling the air and touching the leaves.",
+            "That's... that's actually really beautiful.",
+            "And you just crossed it blind. Without the plants. Without the braille. Just a radar.",
+            "Wait, was that... a test? You made me experience what blind people go through here?",
+            "Now you know why this garden exists. And why it deserves to be remembered.",
+            "OK. Hats off. Truly. But the pigeon thing wasn't necessary.",
+            "The garden faces due north. The plants have never really grown well.",
+            "What? What does that have to do with anything?",
+            "I'm just saying that even the best ideas have their flaws. This garden proves it.",
+            "You mean you're a good idea with a flaw?",
+            "I mean what counts is the intention. Not the result.",
+            "...",
+            "Those are the old city moats over there, right?",
+            "Exactly. The garden was built on the site of the old ramparts. The city grows. History stays buried.",
+            "Take care of your eyes, Seb. It's a luxury not everyone has.",
+            "...",
+            "Best end of level of my life.",
+        ],
+    },
+};
+
 // Cinématique 1 : INTRO
 const CINE_INTRO = [
     {
@@ -365,8 +484,8 @@ const keys = {};
 const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
 document.getElementById('controls-hint').innerHTML = isMobile
-    ? 'Incline ton téléphone pour viser.<br>Tape l\'écran pour lâcher une bombe.'
-    : '← → ou A D pour viser.<br>Espace ou clic pour lâcher une bombe.';
+    ? t('pigeon.hint-mobile')
+    : t('pigeon.hint-pc');
 
 /**
  * Adapte la taille des deux canvas à la fenêtre du téléphone.
@@ -703,7 +822,7 @@ function draw() {
         ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 24);
         ctx.fillStyle = '#fff';
         ctx.font = '18px monospace';
-        ctx.fillText('Tape pour rejouer', canvas.width / 2, canvas.height / 2 + 24);
+        ctx.fillText(t('pigeon.tap-replay'), canvas.width / 2, canvas.height / 2 + 24);
     }
 }
 
@@ -776,7 +895,7 @@ document.getElementById('game-launch-btn').addEventListener('click', () => {
     const sfxUnlock = new Audio('../assets/sound/sfx/talking.mp3');
     sfxUnlock.play().then(() => sfxUnlock.pause()).catch(() => { });
 
-    Cinematic.play(canvas, CINE_INTRO, () => {
+    Cinematic.play(canvas, applyCineTexts(CINE_INTRO, CINE_TEXTS[getLang()].intro), () => {
         document.getElementById('start-overlay').style.display = 'flex';
     });
 });
@@ -963,14 +1082,14 @@ function startRadarPhase() {
     gameStarted = false;
     if (pigeonMusic) { pigeonMusic.pause(); pigeonMusic = null; }
     document.getElementById('pigeon-pause-btn').style.display = 'none';
-    Cinematic.play(canvas, CINE_TRANSITION, () => {
+    Cinematic.play(canvas, applyCineTexts(CINE_TRANSITION, CINE_TEXTS[getLang()].transition), () => {
         // Afficher le menu avant de lancer le radar
         const overlay = document.getElementById('start-overlay');
-        overlay.querySelector('h1').textContent = 'RADAR ODORANT';
+        overlay.querySelector('h1').textContent = t('radar.title');
         document.getElementById('controls-hint').innerHTML = isMobile
-            ? 'Utilise le GPS et la boussole<br>pour trouver les 3 cibles.'
-            : 'Déplace-toi pour trouver les 3 cibles<br>affichées sur le radar.';
-        document.getElementById('start-btn').textContent = 'JOUER';
+            ? t('radar.hint-mobile')
+            : t('radar.hint-pc');
+        document.getElementById('start-btn').textContent = t('game.play');
         overlay.style.display = 'flex';
         // Le bouton JOUER lancera le radar
         _nextPhase = 'radar';
@@ -1338,7 +1457,7 @@ function handleRadarTap() {
         document.getElementById('radar-pause-menu').classList.remove('open');
 
         // Jouer la cinématique de fin, puis passer au niveau suivant (ou retour menu en dev mode)
-        Cinematic.play(canvas, CINE_END, () => {
+        Cinematic.play(canvas, applyCineTexts(CINE_END, CINE_TEXTS[getLang()].end), () => {
             if (localStorage.getItem('devMode') === 'true') {
                 localStorage.setItem('devMode', 'false');
                 window.location.href = '../index.html';
@@ -1377,3 +1496,26 @@ function handleRadarTap() {
         scheduleBeep();
     }
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  TRADUCTION — initialisation et réaction au changement de langue
+// ══════════════════════════════════════════════════════════════════
+applyLang();
+
+window.addEventListener('langchange', () => {
+    // Textes d'interface mis à jour via data-i18n par applyLang() déjà appelé.
+    // On rafraîchit les textes dynamiques non couverts par data-i18n.
+    if (_nextPhase === 'radar' || radarPhase) {
+        document.getElementById('controls-hint').innerHTML = isMobile
+            ? t('radar.hint-mobile')
+            : t('radar.hint-pc');
+        const overlay = document.getElementById('start-overlay');
+        if (overlay.style.display !== 'none') {
+            overlay.querySelector('h1').textContent = t('radar.title');
+        }
+    } else {
+        document.getElementById('controls-hint').innerHTML = isMobile
+            ? t('pigeon.hint-mobile')
+            : t('pigeon.hint-pc');
+    }
+});

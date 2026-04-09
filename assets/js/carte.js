@@ -1,3 +1,37 @@
+// ══════════════════════════════════════════════════════════════════
+//  TRADUCTIONS DES CINÉMATIQUES DE BRIEFING
+//  Textes injectés via applyCineTexts() au moment du play.
+//  L'ordre correspond aux steps non-vides du briefing de chaque niveau.
+// ══════════════════════════════════════════════════════════════════
+const BRIEFING_TEXTS = [
+    // Niveau 0 — Jardin des Senteurs
+    {
+        fr: [
+            "Mulhouse. Ville calme, bonne réputation. Exactement ce qu'il me fallait.",
+            "Je me suis blessé l'orteil. Franchement, ça fait mal.",
+            "Le médecin a dit : 'Reposez-vous.' Mais bon, je me faisait chier.",
+            "Alors j'ai cherché un endroit tranquille. Pas trop de bruit. Pas trop de marche. Un peu de verdure.",
+            "Le Jardin des Senteurs. Ça m'a intrigué.",
+            "Quelques minutes à pied depuis l'Université Populaire. L'orteil va survivre.",
+            "Allez. En route. Doucement.",
+        ],
+        en: [
+            "Mulhouse. Quiet town, good reputation. Exactly what I needed.",
+            "I hurt my toe. Seriously, it hurts. More than a prod bug on a Friday night.",
+            "The doctor said: 'Get some rest.' But I was going insane just lying around.",
+            "So I found somewhere calm. Not too noisy. Not too much walking. A bit of greenery.",
+            "The Jardin des Senteurs. It intrigued me.",
+            "A few minutes on foot from the Université Populaire. The toe will survive.",
+            "Alright. Let's go. Slowly.",
+        ],
+    },
+    // Niveau 1 — placeholder
+    {
+        fr: [ "Excellent travail ! L'aventure continue...", "Prochaine destination." ],
+        en: [ "Excellent work! The adventure continues...", "Next destination." ],
+    },
+];
+
 // =======
 //  NIVEAUX
 // =======
@@ -140,7 +174,7 @@ window.addEventListener('load', () => {
 
     document.getElementById('map-destination-name').textContent = currentLevel.destination.name;
 
-    Cinematic.play(canvas, currentLevel.briefing, () => {
+    Cinematic.play(canvas, applyCineTexts(currentLevel.briefing, BRIEFING_TEXTS[level][getLang()]), () => {
         canvas.style.display = 'none';
         document.getElementById('map-container').style.display = 'block';
         document.getElementById('carte-pause-btn').style.display = 'flex';
@@ -179,11 +213,11 @@ function initMap(level) {
     if ('geolocation' in navigator) {
         watchId = navigator.geolocation.watchPosition(
             pos => onPosition(pos, level),
-            () => { document.getElementById('map-distance').textContent = 'GPS indisponible'; },
+            () => { document.getElementById('map-distance').textContent = t('carte.gps-unavail'); },
             { enableHighAccuracy: true, maximumAge: 4000, timeout: 15000 }
         );
     } else {
-        document.getElementById('map-distance').textContent = 'GPS non supporté';
+        document.getElementById('map-distance').textContent = t('carte.gps-unsupported');
     }
 }
 
@@ -213,7 +247,7 @@ function onPosition(pos, level) {
     const distStr = dist < 1000
         ? `${Math.round(dist)} m`
         : `${(dist / 1000).toFixed(2)} km`;
-    document.getElementById('map-distance').textContent = `Distance : ${distStr}`;
+    document.getElementById('map-distance').textContent = t('carte.dist', { d: distStr });
 
     if (dist <= ARRIVAL_RADIUS) {
         triggerArrival(level);
@@ -237,8 +271,8 @@ function triggerArrival(level) {
 // ==============
 function showFinished() {
     const overlay = document.getElementById('arrival-overlay');
-    document.getElementById('arrival-title').textContent = 'Aventure terminée !';
-    document.getElementById('arrival-sub').textContent = 'Tu as complété toutes les étapes. Bravo !';
+    document.getElementById('arrival-title').textContent = t('carte.finished-title');
+    document.getElementById('arrival-sub').textContent = t('carte.finished-sub');
     overlay.style.display = 'flex';
 }
 
@@ -285,6 +319,21 @@ document.getElementById('carte-resume-btn').addEventListener('click', () => {
 
 document.getElementById('carte-menu-btn').addEventListener('click', () => {
     window.location.href = '../index.html';
+});
+
+// ══════════════════════════════════════════════════════════════════
+//  TRADUCTION — initialisation et réaction au changement de langue
+// ══════════════════════════════════════════════════════════════════
+applyLang();
+
+window.addEventListener('langchange', () => {
+    // applyLang() a déjà mis à jour les data-i18n.
+    // La distance s'auto-mettra à jour au prochain callback GPS.
+    // On rafraîchit le texte "GPS en attente" si la carte est visible et la distance statique.
+    const distEl = document.getElementById('map-distance');
+    if (distEl && distEl.getAttribute('data-i18n') === 'carte.searching') {
+        distEl.textContent = t('carte.searching');
+    }
 });
 
 // =========

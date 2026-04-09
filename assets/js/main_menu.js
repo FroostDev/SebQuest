@@ -1,3 +1,5 @@
+applyLang();
+
 const blur_overlay = document.querySelector("#start_overlay");
 const start_main_menu = document.querySelector("#start_overlay>button");
 const hamburger_btn = document.querySelector("#hamburger_menu");
